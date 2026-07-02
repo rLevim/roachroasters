@@ -1,0 +1,18 @@
+{
+  "name": "RoachRoasters",
+  "short_name": "RoachRoasters",
+  "description": "Fear no roach. Connect with Roach Roasters near you.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#EEEDFE",
+  "theme_color": "#534AB7",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

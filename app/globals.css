@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --color-purple-mid: #7F77DD;
+  --color-purple-dark: #534AB7;
+  --color-purple-deep: #3C3489;
+  --color-purple-ink: #26215C;
+  --color-purple-light: #CECBF6;
+  --color-lavender: #EEEDFE;
+  --color-coral: #4AACB4;
+  --color-coral-light: #E4F4F5;
+  --color-coral-dark: #368A90;
+  --animate-slide-up: slide-up 0.3s ease-out;
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+html { scroll-behavior: smooth; }
+
+input, textarea, select { font-size: 16px !important; }
