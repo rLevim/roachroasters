@@ -10,58 +10,50 @@ export default function AuthCallbackPage() {
   const [debugInfo, setDebugInfo] = useState('Initializing...');
 
   useEffect(() => {
-    let handled = false;
-
-    // Listen for auth state changes — most reliable way to detect login
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (handled) return;
-      setDebugInfo(`Auth event: ${event}`);
-      if (event === 'SIGNED_IN' && session) {
-        handled = true;
-        router.replace('/');
-      }
-    });
-
-    // Also try to handle manually after a delay
     const handleAuth = async () => {
-      // Give Supabase time to process URL tokens
-      await new Promise(r => setTimeout(r, 1000));
-      if (handled) return;
+      // Parse tokens directly from the hash fragment
+      const hash = window.location.hash.substring(1);
+      if (hash) {
+        const params = new URLSearchParams(hash);
+        const accessToken = params.get('access_token');
+        const refreshToken = params.get('refresh_token');
 
-      // Check if session was established
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        handled = true;
-        router.replace('/');
-        return;
+        if (accessToken && refreshToken) {
+          setDebugInfo('Setting session...');
+          const { error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+
+          if (!sessionError) {
+            window.location.hash = '';
+            router.replace('/');
+            return;
+          }
+          setError(`Session error: ${sessionError.message}`);
+          return;
+        }
       }
 
       // Try code exchange (PKCE flow)
-      const params = new URLSearchParams(window.location.search);
-      const code = params.get('code');
+      const searchParams = new URLSearchParams(window.location.search);
+      const code = searchParams.get('code');
       if (code) {
         setDebugInfo('Exchanging code...');
         const { error: codeError } = await supabase.auth.exchangeCodeForSession(code);
         if (!codeError) {
-          handled = true;
           router.replace('/');
           return;
         }
-        setDebugInfo(`Code exchange failed: ${codeError.message}`);
+        setError(`Code exchange failed: ${codeError.message}`);
+        return;
       }
 
-      // After 5 seconds, show error with debug info
-      await new Promise(r => setTimeout(r, 4000));
-      if (!handled) {
-        const hash = window.location.hash ? 'Has hash' : 'No hash';
-        const search = window.location.search || 'No query params';
-        setError(`Login could not complete. Debug: ${hash}, ${search}`);
-      }
+      // No tokens found at all
+      setError('No authentication tokens found in URL.');
     };
 
     handleAuth();
-
-    return () => { subscription.unsubscribe(); };
   }, [router]);
 
   return (
