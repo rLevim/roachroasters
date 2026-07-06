@@ -101,6 +101,17 @@ export interface Review {
   created_at: string;
 }
 
+export interface SupportMessage {
+  id: string;
+  user_id: string;
+  subject: string;
+  message: string;
+  status: 'open' | 'in_progress' | 'resolved';
+  admin_reply: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Transaction {
   id: string;
   job_id: string;

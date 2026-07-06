@@ -134,6 +134,7 @@ export function Navbar() {
           {isBugaphobe && navLink('/payment-method', 'Payment')}
           {navLink('/profile', 'Profile')}
           {navLink('/leaderboard', 'Leaderboard')}
+          {navLink('/support', 'Help & Support')}
           {navLink('/verify', 'Get Verified')}
           <button
             onClick={handleSignOut}

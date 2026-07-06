@@ -1,0 +1,467 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/stores/authStore';
+import { supabase } from '@/lib/supabase';
+import { Navbar } from '@/components/Navbar';
+import { useToastStore } from '@/components/Toast';
+import type { Profile, Job, SupportMessage } from '@/types/database';
+
+const ADMIN_EMAIL = 'rotem.levim@gmail.com';
+
+type Tab = 'overview' | 'users' | 'jobs' | 'support';
+
+export default function AdminPage() {
+  const userId = useAuthStore((s) => s.user?.id);
+  const userEmail = useAuthStore((s) => s.user?.email);
+  const initialized = useAuthStore((s) => s.initialized);
+  const addToast = useToastStore((s) => s.addToast);
+
+  const [tab, setTab] = useState<Tab>('overview');
+  const [users, setUsers] = useState<Profile[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [tickets, setTickets] = useState<(SupportMessage & { profiles?: { display_name: string; photo_url: string | null } })[]>([]);
+  const [stats, setStats] = useState({ totalUsers: 0, totalJobs: 0, activeJobs: 0, completedJobs: 0, totalRevenue: 0, openTickets: 0 });
+  const [loading, setLoading] = useState(true);
+  const [userFilter, setUserFilter] = useState('');
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
+  const [sendingReply, setSendingReply] = useState(false);
+
+  const isAdmin = userEmail === ADMIN_EMAIL;
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    fetchAll();
+  }, [isAdmin]);
+
+  const fetchAll = async () => {
+    setLoading(true);
+    try {
+      await Promise.all([fetchStats(), fetchUsers(), fetchJobs(), fetchTickets()]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    const [{ count: totalUsers }, { count: totalJobs }, { count: activeJobs }, { count: completedJobs }, { data: completedJobData }, { count: openTickets }] = await Promise.all([
+      supabase.from('profiles').select('*', { count: 'exact', head: true }),
+      supabase.from('jobs').select('*', { count: 'exact', head: true }),
+      supabase.from('jobs').select('*', { count: 'exact', head: true }).in('status', ['pending', 'accepted', 'in_progress']),
+      supabase.from('jobs').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
+      supabase.from('jobs').select('price, platform_fee').eq('status', 'completed'),
+      supabase.from('support_messages').select('*', { count: 'exact', head: true }).eq('status', 'open'),
+    ]);
+    const totalRevenue = completedJobData?.reduce((sum: number, j: { platform_fee: number }) => sum + (j.platform_fee || 0), 0) || 0;
+    setStats({
+      totalUsers: totalUsers || 0,
+      totalJobs: totalJobs || 0,
+      activeJobs: activeJobs || 0,
+      completedJobs: completedJobs || 0,
+      totalRevenue,
+      openTickets: openTickets || 0,
+    });
+  };
+
+  const fetchUsers = async () => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (data) setUsers(data as Profile[]);
+  };
+
+  const fetchJobs = async () => {
+    const { data } = await supabase
+      .from('jobs')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(100);
+    if (data) setJobs(data as Job[]);
+  };
+
+  const fetchTickets = async () => {
+    const { data } = await supabase
+      .from('support_messages')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (data && data.length > 0) {
+      const userIds = [...new Set(data.map((t: SupportMessage) => t.user_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, display_name, photo_url')
+        .in('user_id', userIds);
+      const profileMap: Record<string, { display_name: string; photo_url: string | null }> = {};
+      if (profiles) {
+        for (const p of profiles) profileMap[p.user_id] = { display_name: p.display_name, photo_url: p.photo_url };
+      }
+      setTickets(data.map((t: SupportMessage) => ({ ...t, profiles: profileMap[t.user_id] })));
+    } else {
+      setTickets([]);
+    }
+  };
+
+  const handleBanUser = async (targetUserId: string, ban: boolean) => {
+    const action = ban ? 'ban' : 'unban';
+    if (!window.confirm(`Are you sure you want to ${action} this user?`)) return;
+    await supabase.from('profiles').update({ is_banned: ban }).eq('user_id', targetUserId);
+    addToast(`User ${ban ? 'banned' : 'unbanned'}`, 'success');
+    fetchUsers();
+  };
+
+  const handleSuspendUser = async (targetUserId: string, suspend: boolean) => {
+    await supabase.from('profiles').update({ is_suspended: suspend }).eq('user_id', targetUserId);
+    addToast(`User ${suspend ? 'suspended' : 'unsuspended'}`, 'success');
+    fetchUsers();
+  };
+
+  const handleVerifyUser = async (targetUserId: string, verify: boolean) => {
+    await supabase.from('profiles').update({ is_verified: verify }).eq('user_id', targetUserId);
+    addToast(`User ${verify ? 'verified' : 'unverified'}`, 'success');
+    fetchUsers();
+  };
+
+  const handleDeleteUser = async (targetUserId: string) => {
+    if (!window.confirm('Are you sure you want to DELETE this user? This cannot be undone.')) return;
+    if (!window.confirm('Really delete? All their data will be lost.')) return;
+    await supabase.from('profiles').delete().eq('user_id', targetUserId);
+    addToast('User deleted', 'success');
+    fetchUsers();
+  };
+
+  const handleReplyTicket = async (ticketId: string) => {
+    if (!replyText.trim()) return;
+    setSendingReply(true);
+    try {
+      await supabase.from('support_messages').update({
+        admin_reply: replyText.trim(),
+        status: 'resolved',
+        updated_at: new Date().toISOString(),
+      }).eq('id', ticketId);
+      addToast('Reply sent', 'success');
+      setReplyingTo(null);
+      setReplyText('');
+      fetchTickets();
+      fetchStats();
+    } finally {
+      setSendingReply(false);
+    }
+  };
+
+  const handleTicketStatus = async (ticketId: string, status: 'open' | 'in_progress' | 'resolved') => {
+    await supabase.from('support_messages').update({ status, updated_at: new Date().toISOString() }).eq('id', ticketId);
+    addToast('Status updated', 'success');
+    fetchTickets();
+    fetchStats();
+  };
+
+  if (!initialized) {
+    return (
+      <div className="min-h-screen bg-lavender">
+        <Navbar />
+        <div className="flex items-center justify-center py-20">
+          <div className="w-8 h-8 border-4 border-purple-mid/30 border-t-purple-mid rounded-full animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-lavender">
+        <Navbar />
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center space-y-3">
+            <p className="text-5xl">🔒</p>
+            <p className="text-gray-500 font-semibold">Admin access only.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const filteredUsers = users.filter((u) =>
+    !userFilter ||
+    u.display_name.toLowerCase().includes(userFilter.toLowerCase()) ||
+    u.city?.toLowerCase().includes(userFilter.toLowerCase()) ||
+    u.user_id.includes(userFilter)
+  );
+
+  const statusColor: Record<string, string> = {
+    open: 'bg-red-100 text-red-700',
+    in_progress: 'bg-yellow-100 text-yellow-700',
+    resolved: 'bg-green-100 text-green-700',
+  };
+
+  return (
+    <div className="min-h-screen bg-lavender">
+      <Navbar />
+      <div className="max-w-4xl mx-auto p-4 space-y-4">
+        <h1 className="text-2xl font-extrabold text-purple-ink">Admin Dashboard</h1>
+
+        {/* Tabs */}
+        <div className="flex bg-white rounded-xl p-1 gap-1">
+          {([
+            ['overview', 'Overview'],
+            ['users', 'Users'],
+            ['jobs', 'Jobs'],
+            ['support', `Support${stats.openTickets > 0 ? ` (${stats.openTickets})` : ''}`],
+          ] as [Tab, string][]).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setTab(key)}
+              className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-colors cursor-pointer ${
+                tab === key ? 'bg-purple-mid text-white' : 'text-gray-500 hover:text-purple-ink'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {loading ? (
+          <div className="text-center py-10">
+            <div className="w-8 h-8 border-4 border-purple-mid/30 border-t-purple-mid rounded-full animate-spin mx-auto" />
+          </div>
+        ) : (
+          <>
+            {/* Overview */}
+            {tab === 'overview' && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  <div className="bg-white rounded-2xl p-5 text-center">
+                    <p className="text-3xl font-black text-purple-ink">{stats.totalUsers}</p>
+                    <p className="text-xs text-gray-500 mt-1">Total Users</p>
+                  </div>
+                  <div className="bg-white rounded-2xl p-5 text-center">
+                    <p className="text-3xl font-black text-purple-ink">{stats.totalJobs}</p>
+                    <p className="text-xs text-gray-500 mt-1">Total Jobs</p>
+                  </div>
+                  <div className="bg-white rounded-2xl p-5 text-center">
+                    <p className="text-3xl font-black text-purple-ink">{stats.activeJobs}</p>
+                    <p className="text-xs text-gray-500 mt-1">Active Jobs</p>
+                  </div>
+                  <div className="bg-white rounded-2xl p-5 text-center">
+                    <p className="text-3xl font-black text-purple-ink">{stats.completedJobs}</p>
+                    <p className="text-xs text-gray-500 mt-1">Completed</p>
+                  </div>
+                  <div className="bg-white rounded-2xl p-5 text-center">
+                    <p className="text-3xl font-black text-coral">${stats.totalRevenue.toFixed(2)}</p>
+                    <p className="text-xs text-gray-500 mt-1">Platform Revenue</p>
+                  </div>
+                  <div className="bg-white rounded-2xl p-5 text-center">
+                    <p className="text-3xl font-black text-purple-ink">{stats.openTickets}</p>
+                    <p className="text-xs text-gray-500 mt-1">Open Tickets</p>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl p-5 space-y-3">
+                  <h3 className="font-bold text-purple-ink">Recent Users</h3>
+                  {users.slice(0, 5).map((u) => (
+                    <div key={u.id} className="flex items-center gap-3 py-2 border-b border-gray-100 last:border-0">
+                      <div className="w-9 h-9 rounded-full bg-purple-light flex items-center justify-center text-purple-mid font-bold text-sm shrink-0 overflow-hidden">
+                        {u.photo_url ? <img src={u.photo_url} alt="" className="w-full h-full object-cover" /> : u.display_name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-purple-ink text-sm truncate">{u.display_name}</p>
+                        <p className="text-xs text-gray-400">{u.role === 'bugaphobe' ? 'Bugaphobe' : 'Roaster'} · {u.city || 'No city'}</p>
+                      </div>
+                      <p className="text-xs text-gray-400">{new Date(u.created_at).toLocaleDateString()}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Users */}
+            {tab === 'users' && (
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  placeholder="Search by name, city, or ID..."
+                  value={userFilter}
+                  onChange={(e) => setUserFilter(e.target.value)}
+                  className="w-full bg-white border border-gray-200 rounded-xl p-4 text-base focus:outline-none focus:ring-2 focus:ring-purple-mid"
+                />
+                <p className="text-sm text-gray-500">{filteredUsers.length} users</p>
+                {filteredUsers.map((u) => (
+                  <div key={u.id} className="bg-white rounded-2xl p-4 space-y-3">
+                    <div className="flex items-center gap-3">
+                      <a href={`/profile/${u.user_id}`} className="shrink-0">
+                        <div className="w-11 h-11 rounded-full bg-purple-light flex items-center justify-center text-purple-mid font-bold overflow-hidden">
+                          {u.photo_url ? <img src={u.photo_url} alt="" className="w-full h-full object-cover" /> : u.display_name.charAt(0).toUpperCase()}
+                        </div>
+                      </a>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <a href={`/profile/${u.user_id}`} className="font-bold text-purple-ink text-sm hover:underline">{u.display_name}</a>
+                          {u.is_verified && <span className="text-[10px] font-bold text-coral bg-coral-light px-1.5 py-0.5 rounded">Verified</span>}
+                          {u.is_banned && <span className="text-[10px] font-bold text-red-600 bg-red-100 px-1.5 py-0.5 rounded">Banned</span>}
+                          {u.is_suspended && <span className="text-[10px] font-bold text-yellow-600 bg-yellow-100 px-1.5 py-0.5 rounded">Suspended</span>}
+                        </div>
+                        <p className="text-xs text-gray-400">
+                          {u.role === 'bugaphobe' ? 'Bugaphobe' : 'Roaster'} · {u.city || 'No city'} · Joined {new Date(u.created_at).toLocaleDateString()}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          ⭐ {u.rating.toFixed(1)} · {u.total_reviews} reviews
+                          {u.role === 'roach_roaster' && ` · 🪳 ${u.roaches_killed} killed · $${u.price || 0}`}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 flex-wrap">
+                      {!u.is_verified ? (
+                        <button onClick={() => handleVerifyUser(u.user_id, true)} className="text-xs font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded-lg hover:bg-green-100 cursor-pointer">
+                          ✓ Verify
+                        </button>
+                      ) : (
+                        <button onClick={() => handleVerifyUser(u.user_id, false)} className="text-xs font-bold text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg hover:bg-gray-100 cursor-pointer">
+                          Remove Verified
+                        </button>
+                      )}
+                      {!u.is_suspended ? (
+                        <button onClick={() => handleSuspendUser(u.user_id, true)} className="text-xs font-bold text-yellow-600 bg-yellow-50 px-3 py-1.5 rounded-lg hover:bg-yellow-100 cursor-pointer">
+                          Suspend
+                        </button>
+                      ) : (
+                        <button onClick={() => handleSuspendUser(u.user_id, false)} className="text-xs font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded-lg hover:bg-green-100 cursor-pointer">
+                          Unsuspend
+                        </button>
+                      )}
+                      {!u.is_banned ? (
+                        <button onClick={() => handleBanUser(u.user_id, true)} className="text-xs font-bold text-red-600 bg-red-50 px-3 py-1.5 rounded-lg hover:bg-red-100 cursor-pointer">
+                          Ban
+                        </button>
+                      ) : (
+                        <button onClick={() => handleBanUser(u.user_id, false)} className="text-xs font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded-lg hover:bg-green-100 cursor-pointer">
+                          Unban
+                        </button>
+                      )}
+                      <button onClick={() => handleDeleteUser(u.user_id)} className="text-xs font-bold text-red-600 bg-red-50 px-3 py-1.5 rounded-lg hover:bg-red-100 cursor-pointer ml-auto">
+                        Delete User
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Jobs */}
+            {tab === 'jobs' && (
+              <div className="space-y-3">
+                <p className="text-sm text-gray-500">{jobs.length} jobs (latest 100)</p>
+                {jobs.map((j) => {
+                  const statusStyle: Record<string, string> = {
+                    pending: 'bg-yellow-100 text-yellow-700',
+                    accepted: 'bg-blue-100 text-blue-700',
+                    in_progress: 'bg-purple-light text-purple-ink',
+                    completed: 'bg-green-100 text-green-700',
+                    cancelled: 'bg-gray-100 text-gray-500',
+                    disputed: 'bg-red-100 text-red-700',
+                  };
+                  return (
+                    <div key={j.id} className="bg-white rounded-2xl p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-purple-ink text-sm">Job #{j.id.slice(0, 8)}</p>
+                          <p className="text-xs text-gray-400">
+                            ${j.price} + ${j.platform_fee} fee · {new Date(j.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <span className={`text-xs font-bold px-3 py-1 rounded-full ${statusStyle[j.status] || 'bg-gray-100 text-gray-500'}`}>
+                          {j.status}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Support */}
+            {tab === 'support' && (
+              <div className="space-y-3">
+                {tickets.length === 0 ? (
+                  <div className="text-center py-10">
+                    <p className="text-4xl mb-3">📭</p>
+                    <p className="text-gray-500">No support messages yet.</p>
+                  </div>
+                ) : (
+                  tickets.map((t) => (
+                    <div key={t.id} className="bg-white rounded-2xl p-4 space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-purple-light flex items-center justify-center text-purple-mid font-bold text-sm shrink-0 overflow-hidden">
+                          {t.profiles?.photo_url ? <img src={t.profiles.photo_url} alt="" className="w-full h-full object-cover" /> : (t.profiles?.display_name?.charAt(0).toUpperCase() || '?')}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-purple-ink text-sm">{t.profiles?.display_name || 'User'}</p>
+                          <p className="text-xs text-gray-400">{new Date(t.created_at).toLocaleString()}</p>
+                        </div>
+                        <span className={`text-xs font-bold px-3 py-1 rounded-full ${statusColor[t.status]}`}>
+                          {t.status}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-purple-ink text-sm">{t.subject}</p>
+                        <p className="text-sm text-gray-600 mt-1">{t.message}</p>
+                      </div>
+                      {t.admin_reply && (
+                        <div className="bg-purple-light rounded-xl p-3">
+                          <p className="text-xs font-semibold text-purple-ink mb-1">Your reply:</p>
+                          <p className="text-sm text-purple-ink">{t.admin_reply}</p>
+                        </div>
+                      )}
+                      <div className="flex gap-2 flex-wrap">
+                        {t.status !== 'resolved' && (
+                          <>
+                            <button
+                              onClick={() => { setReplyingTo(replyingTo === t.id ? null : t.id); setReplyText(''); }}
+                              className="text-xs font-bold text-purple-mid bg-purple-light px-3 py-1.5 rounded-lg hover:bg-purple-mid hover:text-white cursor-pointer"
+                            >
+                              Reply
+                            </button>
+                            {t.status === 'open' && (
+                              <button onClick={() => handleTicketStatus(t.id, 'in_progress')} className="text-xs font-bold text-yellow-600 bg-yellow-50 px-3 py-1.5 rounded-lg hover:bg-yellow-100 cursor-pointer">
+                                Mark In Progress
+                              </button>
+                            )}
+                            <button onClick={() => handleTicketStatus(t.id, 'resolved')} className="text-xs font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded-lg hover:bg-green-100 cursor-pointer">
+                              Resolve
+                            </button>
+                          </>
+                        )}
+                        {t.status === 'resolved' && (
+                          <button onClick={() => handleTicketStatus(t.id, 'open')} className="text-xs font-bold text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg hover:bg-gray-100 cursor-pointer">
+                            Reopen
+                          </button>
+                        )}
+                      </div>
+                      {replyingTo === t.id && (
+                        <div className="space-y-2">
+                          <textarea
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                            placeholder="Write your reply..."
+                            rows={3}
+                            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-mid resize-none"
+                          />
+                          <button
+                            onClick={() => handleReplyTicket(t.id)}
+                            disabled={!replyText.trim() || sendingReply}
+                            className="bg-purple-mid text-white font-bold text-sm px-5 py-2 rounded-xl hover:bg-purple-dark cursor-pointer disabled:opacity-50"
+                          >
+                            {sendingReply ? 'Sending...' : 'Send Reply'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
