@@ -11,39 +11,9 @@ export default function AuthCallbackPage() {
 
   useEffect(() => {
     const handleAuth = async () => {
-      // Parse tokens from the hash fragment — no decoding (JWTs are ASCII)
-      const hash = window.location.hash.substring(1);
-      if (hash) {
-        const hashObj: Record<string, string> = {};
-        for (const part of hash.split('&')) {
-          const eqIdx = part.indexOf('=');
-          if (eqIdx > 0) {
-            hashObj[part.substring(0, eqIdx)] = part.substring(eqIdx + 1);
-          }
-        }
-        const accessToken = hashObj['access_token'];
-        const refreshToken = hashObj['refresh_token'];
-
-        if (accessToken && refreshToken) {
-          setDebugInfo('Setting session...');
-          const { error: sessionError } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken,
-          });
-
-          if (!sessionError) {
-            window.location.hash = '';
-            router.replace('/');
-            return;
-          }
-          setError(`Session error: ${sessionError.message}`);
-          return;
-        }
-      }
-
-      // Try code exchange (PKCE flow)
       const searchParams = new URLSearchParams(window.location.search);
       const code = searchParams.get('code');
+
       if (code) {
         setDebugInfo('Exchanging code...');
         const { error: codeError } = await supabase.auth.exchangeCodeForSession(code);
@@ -55,8 +25,7 @@ export default function AuthCallbackPage() {
         return;
       }
 
-      // No tokens found at all
-      setError('No authentication tokens found in URL.');
+      setError(`No auth code found. Query: ${window.location.search || 'empty'}, Hash: ${window.location.hash ? 'present' : 'none'}`);
     };
 
     handleAuth();
