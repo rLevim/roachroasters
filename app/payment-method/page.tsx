@@ -70,10 +70,10 @@ function CardForm() {
   };
 
   const brandIcons: Record<string, string> = {
-    visa: '💳 Visa',
-    mastercard: '💳 Mastercard',
-    amex: '💳 Amex',
-    discover: '💳 Discover',
+    visa: 'Visa',
+    mastercard: 'Mastercard',
+    amex: 'Amex',
+    discover: 'Discover',
   };
 
   return (
@@ -81,10 +81,10 @@ function CardForm() {
       {/* Current Card */}
       {savedCard && (
         <div className="bg-purple-light/50 rounded-xl p-4 flex items-center gap-3">
-          <span className="text-2xl">💳</span>
+          <span className="text-2xl"> </span>
           <div className="flex-1">
             <p className="text-sm font-bold text-purple-ink">
-              {brandIcons[savedCard.brand] || `💳 ${savedCard.brand}`}
+              {brandIcons[savedCard.brand] || savedCard.brand}
             </p>
             <p className="text-sm text-gray-600">•••• •••• •••• {savedCard.last4}</p>
           </div>
@@ -132,7 +132,7 @@ function CardForm() {
       </button>
 
       <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
-        <span>🔒</span>
+        <span> </span>
         <span>Secured by Stripe. We never see or store your full card number.</span>
       </div>
     </div>

@@ -81,7 +81,7 @@ export default function EarningsPage() {
           {paypalEmail ? (
             <div className="space-y-3">
               <div className="flex items-center gap-3 bg-purple-light/50 rounded-xl p-4">
-                <span className="text-2xl">💳</span>
+                <span className="text-2xl"> </span>
                 <div className="flex-1">
                   <p className="text-sm font-bold text-purple-ink">PayPal</p>
                   <p className="text-sm text-gray-600">{paypalEmail}</p>

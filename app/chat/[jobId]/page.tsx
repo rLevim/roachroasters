@@ -194,7 +194,7 @@ export default function ChatPage() {
             {/* Bugaphobe can share location after accepting */}
             {!isRoaster && currentJob.status === 'accepted' && !currentJob.location_lat && (
               <Button
-                title="📍 Share My Location"
+                title="Share My Location"
                 onClick={() => setShowLocationForm(true)}
                 variant="primary"
                 size="sm"
@@ -203,7 +203,7 @@ export default function ChatPage() {
             )}
             {!isRoaster && currentJob.status === 'accepted' && currentJob.location_lat && (
               <span className="flex-1 text-center text-sm text-green-700 font-semibold py-2">
-                📍 Location shared
+                Location shared
               </span>
             )}
             {/* Accepted = roaster heading over */}
@@ -231,7 +231,7 @@ export default function ChatPage() {
                   const { data: msgs } = await supabase.from('messages').select('content').eq('job_id', jobId).eq('content', 'BUGAPHOBE_CONFIRMED_DONE');
                   if (msgs && msgs.length > 0) {
                     await updateJobStatus(jobId, 'completed');
-                    await sendMessage(jobId, 'Both sides confirmed — job completed! 🎉', 'system');
+                    await sendMessage(jobId, 'Both sides confirmed — job completed!', 'system');
                   }
                 }}
                 variant="coral"
@@ -255,7 +255,7 @@ export default function ChatPage() {
                   const { data: msgs } = await supabase.from('messages').select('content').eq('job_id', jobId).eq('content', 'ROASTER_CONFIRMED_DONE');
                   if (msgs && msgs.length > 0) {
                     await updateJobStatus(jobId, 'completed');
-                    await sendMessage(jobId, 'Both sides confirmed — job completed! 🎉', 'system');
+                    await sendMessage(jobId, 'Both sides confirmed — job completed!', 'system');
                   }
                 }}
                 variant="coral"
@@ -283,7 +283,7 @@ export default function ChatPage() {
         <div className="bg-purple-light border-b border-purple-mid/20 px-4 py-4">
           <div className="max-w-2xl mx-auto space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-purple-ink text-sm">📍 Share Your Location</h3>
+              <h3 className="font-bold text-purple-ink text-sm">Share Your Location</h3>
               <button
                 onClick={() => setShowLocationForm(false)}
                 className="text-gray-400 hover:text-gray-600 text-lg cursor-pointer"
@@ -338,7 +338,7 @@ export default function ChatPage() {
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-mid bg-white resize-none"
             />
             <Button
-              title={sharingLocation ? 'Sharing...' : '📍 Confirm & Share Location'}
+              title={sharingLocation ? 'Sharing...' : 'Confirm & Share Location'}
               onClick={async () => {
                 if (!locationDetails.address.trim()) {
                   window.alert('Please enter a street address.');
@@ -359,14 +359,14 @@ export default function ChatPage() {
                     navigator.geolocation.getCurrentPosition(
                       async (pos) => {
                         await shareLocation(jobId, pos.coords.latitude, pos.coords.longitude);
-                        await sendMessage(jobId, `📍 Location details:\n${details}`);
+                        await sendMessage(jobId, `Location details:\n${details}`);
                         setShowLocationForm(false);
                         setSharingLocation(false);
                         addToast('Location shared!', 'success');
                       },
                       async () => {
                         await shareLocation(jobId, 0, 0);
-                        await sendMessage(jobId, `📍 Location details:\n${details}`);
+                        await sendMessage(jobId, `Location details:\n${details}`);
                         setShowLocationForm(false);
                         setSharingLocation(false);
                         addToast('Location shared!', 'success');
@@ -374,7 +374,7 @@ export default function ChatPage() {
                     );
                   } else {
                     await shareLocation(jobId, 0, 0);
-                    await sendMessage(jobId, `📍 Location details:\n${details}`);
+                    await sendMessage(jobId, `Location details:\n${details}`);
                     setShowLocationForm(false);
                     setSharingLocation(false);
                   }
@@ -428,7 +428,7 @@ export default function ChatPage() {
                     rel="noopener noreferrer"
                     className="inline-block bg-purple-light text-purple-ink rounded-2xl px-5 py-3 text-sm font-semibold hover:bg-purple-mid hover:text-white transition-colors"
                   >
-                    📍 Location shared — Open in Google Maps
+                    Location shared — Open in Google Maps
                   </a>
                 </div>
               );
@@ -480,7 +480,7 @@ export default function ChatPage() {
       {currentJob.status === 'completed' && (
         <div className="bg-green-50 border-t border-green-200 px-4 py-4">
           <div className="max-w-2xl mx-auto space-y-4">
-            <p className="text-green-700 font-bold text-center">Job completed! 🎉</p>
+            <p className="text-green-700 font-bold text-center">Job completed!</p>
 
             {/* Other person's review of you */}
             {otherReview && (

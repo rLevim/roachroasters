@@ -143,7 +143,7 @@ export default function AlertDetailPage() {
         {/* Alert Info */}
         <div className="bg-white rounded-2xl p-4 space-y-3">
           <div className="flex items-center gap-4">
-            <span className="text-4xl">🪳</span>
+            <span className="text-4xl"> </span>
             <div className="flex-1">
               <p className="text-sm font-extrabold text-coral">{alert.status.toUpperCase()}</p>
               {alert.description && <p className="text-gray-700 mt-1">{alert.description}</p>}
@@ -151,7 +151,7 @@ export default function AlertDetailPage() {
           </div>
           {distanceKm !== null && (
             <p className="text-sm text-purple-mid font-semibold">
-              📍 ~{distanceKm < 1 ? `${Math.round(distanceKm * 1000)}m` : `${distanceKm.toFixed(1)}km`} away from you
+              ~{distanceKm < 1 ? `${Math.round(distanceKm * 1000)}m` : `${distanceKm.toFixed(1)}km`} away from you
             </p>
           )}
           {alert.photo_url && (
@@ -166,7 +166,7 @@ export default function AlertDetailPage() {
               <p className="text-green-700 font-bold">You've responded! Waiting for the Bugaphobe to pick you.</p>
             </div>
           ) : (
-            <Button title="🔥 I'll Roast It!" onClick={handleRespond} variant="coral" size="lg" loading={responding} className="w-full" />
+            <Button title="I'll Roast It!" onClick={handleRespond} variant="coral" size="lg" loading={responding} className="w-full" />
           )
         )}
 
@@ -198,7 +198,7 @@ export default function AlertDetailPage() {
                         )}
                       </div>
                       <p className="text-sm text-gray-500">
-                        ⭐ {resp.profiles?.rating?.toFixed(1) || '0.0'} · 🪳 {resp.profiles?.roaches_killed || 0} killed · ${resp.profiles?.price || '?'}
+                        {resp.profiles?.rating?.toFixed(1) || '0.0'} rating · {resp.profiles?.roaches_killed || 0} killed · ${resp.profiles?.price || '?'}
                       </p>
                     </div>
                   </a>

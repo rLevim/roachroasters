@@ -76,7 +76,7 @@ export default function VerifyPage() {
         <Navbar />
         <div className="max-w-md mx-auto p-4 space-y-4">
           <div className="bg-white rounded-2xl p-8 text-center space-y-4">
-            <span className="text-6xl block">✅</span>
+            <span className="text-6xl block"> </span>
             <h2 className="text-2xl font-extrabold text-purple-ink">You are verified!</h2>
             <p className="text-gray-500 text-sm">Your identity has been confirmed. A verified badge appears on your profile.</p>
           </div>
@@ -93,7 +93,7 @@ export default function VerifyPage() {
 
         <div className="bg-white rounded-2xl p-6 space-y-4">
           <div className="text-center space-y-2">
-            <span className="text-5xl block">🛡️</span>
+            <span className="text-5xl block"> </span>
             <p className="text-sm text-gray-600">
               Upload a clear photo of a government-issued ID (passport, driver license, or national ID).
               This helps build trust and shows others you are who you say you are.
@@ -112,7 +112,7 @@ export default function VerifyPage() {
 
           {submitted ? (
             <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center space-y-2">
-              <span className="text-3xl block">⏳</span>
+              <span className="text-3xl block"> </span>
               <p className="text-green-700 font-bold">Verification submitted!</p>
               <p className="text-green-600 text-sm">We will review your ID and update your profile within 24 hours.</p>
             </div>
@@ -138,7 +138,7 @@ export default function VerifyPage() {
               />
 
               <Button
-                title={uploading ? 'Uploading...' : '📷 Upload ID Photo'}
+                title={uploading ? 'Uploading...' : 'Upload ID Photo'}
                 onClick={() => fileInputRef.current?.click()}
                 variant="coral"
                 size="lg"
@@ -150,7 +150,7 @@ export default function VerifyPage() {
         </div>
 
         <p className="text-xs text-gray-400 text-center px-4">
-          🔒 Your ID photo is stored securely and only accessible to our verification team.
+          Your ID photo is stored securely and only accessible to our verification team.
           It will be deleted after review.
         </p>
       </div>

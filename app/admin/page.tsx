@@ -173,7 +173,7 @@ export default function AdminPage() {
         <Navbar />
         <div className="flex items-center justify-center py-20">
           <div className="text-center space-y-3">
-            <p className="text-5xl">🔒</p>
+            <p className="text-5xl"> </p>
             <p className="text-gray-500 font-semibold">Admin access only.</p>
           </div>
         </div>
@@ -304,8 +304,8 @@ export default function AdminPage() {
                           {u.role === 'bugaphobe' ? 'Bugaphobe' : 'Roaster'} · {u.city || 'No city'} · Joined {new Date(u.created_at).toLocaleDateString()}
                         </p>
                         <p className="text-xs text-gray-400">
-                          ⭐ {u.rating.toFixed(1)} · {u.total_reviews} reviews
-                          {u.role === 'roach_roaster' && ` · 🪳 ${u.roaches_killed} killed · $${u.price || 0}`}
+                          {u.rating.toFixed(1)} rating · {u.total_reviews} reviews
+                          {u.role === 'roach_roaster' && ` · ${u.roaches_killed} killed · $${u.price || 0}`}
                         </p>
                       </div>
                     </div>
@@ -383,7 +383,7 @@ export default function AdminPage() {
               <div className="space-y-3">
                 {tickets.length === 0 ? (
                   <div className="text-center py-10">
-                    <p className="text-4xl mb-3">📭</p>
+                    <p className="text-4xl mb-3"> </p>
                     <p className="text-gray-500">No support messages yet.</p>
                   </div>
                 ) : (

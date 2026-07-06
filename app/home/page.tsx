@@ -112,7 +112,9 @@ export default function HomePage() {
       <div className="max-w-2xl mx-auto p-4 space-y-4">
         {/* Welcome Card */}
         <div className="bg-purple-dark rounded-3xl p-6 flex items-center gap-4">
-          <span className="text-5xl">{isBugaphobe ? '😱' : '💪'}</span>
+          <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white text-xl font-black">
+            {(profile?.display_name || '?')[0].toUpperCase()}
+          </div>
           <div className="flex-1">
             <h2 className="text-2xl font-extrabold text-white">
               Hey, {profile?.display_name || 'there'}!
@@ -132,7 +134,7 @@ export default function HomePage() {
             href="/browse"
             className="block bg-coral text-white rounded-2xl p-4 text-center hover:bg-coral-dark transition-colors"
           >
-            <p className="text-lg font-extrabold">🚨 {openAlertCount} active alert{openAlertCount !== 1 ? 's' : ''} nearby!</p>
+            <p className="text-lg font-extrabold">{openAlertCount} active alert{openAlertCount !== 1 ? 's' : ''} nearby!</p>
             <p className="text-sm text-white/80 mt-1">Tap to view and respond</p>
           </Link>
         )}
@@ -143,7 +145,7 @@ export default function HomePage() {
             href="/activity"
             className="block bg-purple-mid text-white rounded-2xl p-4 text-center hover:bg-purple-dark transition-colors"
           >
-            <p className="text-lg font-extrabold">💬 {pendingJobCount} active job{pendingJobCount !== 1 ? 's' : ''}</p>
+            <p className="text-lg font-extrabold">{pendingJobCount} active job{pendingJobCount !== 1 ? 's' : ''}</p>
             <p className="text-sm text-white/80 mt-1">Tap to view conversations</p>
           </Link>
         )}
@@ -203,7 +205,7 @@ export default function HomePage() {
             href="/alerts/create"
             className="block bg-coral text-white text-center text-lg font-extrabold py-4 rounded-2xl hover:bg-coral-dark transition-colors"
           >
-            🚨  Post a Roach Alert
+            Post a Roach Alert
           </Link>
         )}
 
@@ -218,7 +220,9 @@ export default function HomePage() {
                 className="block bg-white rounded-2xl p-4 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center gap-4">
-                  <span className="text-3xl">🪳</span>
+                  <div className="w-10 h-10 rounded-full bg-purple-light/30 flex items-center justify-center">
+                    <svg className="w-5 h-5 text-purple-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M12 3a9 9 0 100 18 9 9 0 000-18z" /></svg>
+                  </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-bold text-purple-ink text-sm">
                       {alert.description || 'Roach Alert'}
@@ -247,12 +251,16 @@ export default function HomePage() {
         {/* Quick Links */}
         <div className="grid gap-3 grid-cols-4">
           <Link href="/leaderboard" className="bg-white rounded-2xl p-4 text-center hover:shadow-md transition-shadow">
-            <span className="text-3xl block mb-1">🏆</span>
+            <div className="w-10 h-10 rounded-full bg-purple-light/30 flex items-center justify-center mx-auto mb-1">
+              <svg className="w-5 h-5 text-purple-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m6 0h6m-6 0V9a2 2 0 012-2h2a2 2 0 012 2v10m6 0v-4a2 2 0 00-2-2h-2a2 2 0 00-2 2v4" /></svg>
+            </div>
             <span className="text-xs font-semibold text-purple-ink">Leaderboard</span>
           </Link>
           <Link href="/browse" className="bg-white rounded-2xl p-4 text-center hover:shadow-md transition-shadow relative">
-            <span className="text-3xl block mb-1">{isBugaphobe ? '🔍' : '🚨'}</span>
-            <span className="text-xs font-semibold text-purple-ink">{isBugaphobe ? 'Browse Roasters' : 'View Alerts'}</span>
+            <div className="w-10 h-10 rounded-full bg-purple-light/30 flex items-center justify-center mx-auto mb-1">
+              <svg className="w-5 h-5 text-purple-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            </div>
+            <span className="text-xs font-semibold text-purple-ink">{isBugaphobe ? 'Browse' : 'Alerts'}</span>
             {isRoaster && openAlertCount > 0 && (
               <span className="absolute top-2 right-2 bg-coral text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">
                 {openAlertCount}
@@ -260,7 +268,9 @@ export default function HomePage() {
             )}
           </Link>
           <Link href="/activity" className="bg-white rounded-2xl p-4 text-center hover:shadow-md transition-shadow relative">
-            <span className="text-3xl block mb-1">📋</span>
+            <div className="w-10 h-10 rounded-full bg-purple-light/30 flex items-center justify-center mx-auto mb-1">
+              <svg className="w-5 h-5 text-purple-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 5h6" /></svg>
+            </div>
             <span className="text-xs font-semibold text-purple-ink">My Jobs</span>
             {pendingJobCount > 0 && (
               <span className="absolute top-2 right-2 bg-coral text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">
@@ -270,12 +280,16 @@ export default function HomePage() {
           </Link>
           {isRoaster ? (
             <Link href="/earnings" className="bg-white rounded-2xl p-4 text-center hover:shadow-md transition-shadow">
-              <span className="text-3xl block mb-1">💰</span>
+              <div className="w-10 h-10 rounded-full bg-purple-light/30 flex items-center justify-center mx-auto mb-1">
+                <svg className="w-5 h-5 text-purple-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V6m0 8v2" /></svg>
+              </div>
               <span className="text-xs font-semibold text-purple-ink">Earnings</span>
             </Link>
           ) : (
             <Link href="/payment-method" className="bg-white rounded-2xl p-4 text-center hover:shadow-md transition-shadow">
-              <span className="text-3xl block mb-1">💳</span>
+              <div className="w-10 h-10 rounded-full bg-purple-light/30 flex items-center justify-center mx-auto mb-1">
+                <svg className="w-5 h-5 text-purple-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+              </div>
               <span className="text-xs font-semibold text-purple-ink">Payment</span>
             </Link>
           )}

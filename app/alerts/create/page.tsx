@@ -61,7 +61,7 @@ export default function CreateAlertPage() {
       <div className="max-w-xl mx-auto p-4 space-y-4">
         {/* Hero */}
         <div className="bg-purple-dark rounded-3xl p-6 text-center">
-          <span className="text-6xl block mb-2">🪳</span>
+          <span className="text-6xl block mb-2"> </span>
           <h1 className="text-2xl font-extrabold text-white">Spotted a Roach?</h1>
           <p className="text-purple-light text-sm mt-1">Post an alert and nearby Roach Roasters will come to your rescue!</p>
         </div>
@@ -82,9 +82,9 @@ export default function CreateAlertPage() {
         <div className="bg-white rounded-2xl p-4">
           <label className="text-sm font-semibold text-purple-ink block mb-2">Your Location</label>
           {locLoading ? (
-            <p className="text-sm text-gray-500">📍 Detecting location...</p>
+            <p className="text-sm text-gray-500">Detecting location...</p>
           ) : location ? (
-            <p className="text-sm text-gray-600">📍 Location detected ({location.lat.toFixed(4)}, {location.lng.toFixed(4)})</p>
+            <p className="text-sm text-gray-600">Location detected ({location.lat.toFixed(4)}, {location.lng.toFixed(4)})</p>
           ) : (
             <p className="text-sm text-coral-dark">Location not available. Please enable location services.</p>
           )}
@@ -97,7 +97,7 @@ export default function CreateAlertPage() {
         )}
 
         <Button
-          title="🚨  Post Roach Alert"
+          title="Post Roach Alert"
           onClick={handleSubmit}
           variant="coral"
           size="lg"

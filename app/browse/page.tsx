@@ -105,9 +105,9 @@ function BrowseRoasters() {
               </span>
             </a>
             <div className="flex gap-4 mt-2 pl-16 text-sm text-gray-600">
-              <span>⭐ {roaster.rating?.toFixed(1) || '0.0'}</span>
-              <span>🪳 {roaster.roaches_killed} killed</span>
-              <span>📝 {roaster.total_reviews} reviews</span>
+              <span>{roaster.rating?.toFixed(1) || '0.0'} rating</span>
+              <span>{roaster.roaches_killed} killed</span>
+              <span>{roaster.total_reviews} reviews</span>
             </div>
           </div>
         ))
@@ -207,12 +207,12 @@ function BrowseAlerts() {
           return (
             <div key={alert.id} className="bg-white rounded-2xl p-4 space-y-3">
               <Link href={`/alerts/${alert.id}`} className="flex items-center gap-4">
-                <span className="text-4xl">🪳</span>
+                <span className="text-4xl"> </span>
                 <div className="flex-1">
                   <p className="font-bold text-purple-ink">{alert.profiles?.display_name || 'A Bugaphobe'}</p>
                   <p className="text-sm text-gray-500">{alert.description || 'Needs help with a roach!'}</p>
                   {distanceKm !== null && (
-                    <p className="text-sm text-purple-mid font-semibold mt-1">📍 ~{formatDistance(distanceKm)} away</p>
+                    <p className="text-sm text-purple-mid font-semibold mt-1">~{formatDistance(distanceKm)} away</p>
                   )}
                 </div>
                 <span className="bg-coral text-white font-extrabold text-sm px-3 py-1 rounded-full">OPEN</span>
@@ -222,7 +222,7 @@ function BrowseAlerts() {
                   href={`/chat/${activeJobId}`}
                   className="block w-full bg-purple-mid text-white font-extrabold py-3 rounded-xl text-center hover:bg-purple-dark transition-colors"
                 >
-                  💬 Go to Chat
+                  Go to Chat
                 </Link>
               ) : hasResponded ? (
                 <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-center">
@@ -237,7 +237,7 @@ function BrowseAlerts() {
                   {respondingId === alert.id ? (
                     <span className="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
-                    "🔥 I'll Roast It!"
+                    "I'll Roast It!"
                   )}
                 </button>
               )}

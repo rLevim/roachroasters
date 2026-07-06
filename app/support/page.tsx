@@ -166,7 +166,7 @@ export default function SupportPage() {
         {/* My Tickets */}
         {myTickets.length === 0 && !showForm ? (
           <div className="text-center py-10 space-y-3">
-            <p className="text-5xl">💬</p>
+            <p className="text-5xl"> </p>
             <p className="text-gray-500">No messages yet.</p>
             <p className="text-sm text-gray-400">Need help? Tap "New Message" to reach our team.</p>
           </div>

@@ -95,7 +95,7 @@ export default function ActivityPage() {
           <ListSkeleton count={3} />
         ) : displayJobs.length === 0 ? (
           <div className="text-center py-10">
-            <p className="text-4xl mb-3">{tab === 'active' ? '🪳' : '🏆'}</p>
+            <p className="text-4xl mb-3"> </p>
             <p className="text-gray-500">
               {tab === 'active' ? 'No active jobs right now.' : 'No past jobs yet.'}
             </p>

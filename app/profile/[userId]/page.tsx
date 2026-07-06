@@ -184,25 +184,25 @@ export default function PublicProfilePage() {
           <div className="space-y-2">
             <div className="flex items-center gap-3">
               <span className={`text-lg ${profile.photo_url ? '' : 'opacity-30'}`}>
-                {profile.photo_url ? '✅' : '⬜'}
+                {profile.photo_url ? '✓' : '—'}
               </span>
               <span className="text-sm text-gray-700">Profile photo added</span>
             </div>
             <div className="flex items-center gap-3">
               <span className={`text-lg ${profile.bio ? '' : 'opacity-30'}`}>
-                {profile.bio ? '✅' : '⬜'}
+                {profile.bio ? '✓' : '—'}
               </span>
               <span className="text-sm text-gray-700">Bio written</span>
             </div>
             <div className="flex items-center gap-3">
               <span className={`text-lg ${profile.is_verified ? '' : 'opacity-30'}`}>
-                {profile.is_verified ? '✅' : '⬜'}
+                {profile.is_verified ? '✓' : '—'}
               </span>
               <span className="text-sm text-gray-700">Identity verified</span>
             </div>
             <div className="flex items-center gap-3">
               <span className={`text-lg ${(profile.total_reviews || 0) > 0 ? '' : 'opacity-30'}`}>
-                {(profile.total_reviews || 0) > 0 ? '✅' : '⬜'}
+                {(profile.total_reviews || 0) > 0 ? '✓' : '—'}
               </span>
               <span className="text-sm text-gray-700">Has reviews from others</span>
             </div>

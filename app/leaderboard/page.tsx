@@ -53,7 +53,7 @@ export default function LeaderboardPage() {
     }
   };
 
-  const medals = ['🥇', '🥈', '🥉'];
+  const medals = ['1st', '2nd', '3rd'];
 
   return (
     <div className="min-h-screen bg-lavender">
