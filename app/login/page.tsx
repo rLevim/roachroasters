@@ -28,7 +28,7 @@ export default function LoginPage() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: window.location.origin },
     });
     if (error) { setErrorMsg(error.message); setLoading(false); }
   };
@@ -37,7 +37,7 @@ export default function LoginPage() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'facebook',
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: window.location.origin },
     });
     if (error) { setErrorMsg(error.message); setLoading(false); }
   };
