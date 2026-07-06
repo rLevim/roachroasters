@@ -5,7 +5,6 @@ import { NextResponse } from 'next/server';
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const next = searchParams.get('next') ?? '/';
 
   if (code) {
     const cookieStore = await cookies();
@@ -17,10 +16,14 @@ export async function GET(request: Request) {
           getAll() {
             return cookieStore.getAll();
           },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              cookieStore.set(name, value, options);
-            });
+          setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) => {
+                cookieStore.set(name, value, options);
+              });
+            } catch {
+              // Ignore errors in middleware/server context
+            }
           },
         },
       }
@@ -28,9 +31,10 @@ export async function GET(request: Request) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+      return NextResponse.redirect(`${origin}/`);
     }
   }
 
-  return NextResponse.redirect(`${origin}/login?error=auth`);
+  // Fallback: redirect to root which will check auth state
+  return NextResponse.redirect(`${origin}/`);
 }

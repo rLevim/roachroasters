@@ -19,29 +19,6 @@ export default function LoginPage() {
       router.replace('/');
     }
   }, [initialized, session, router]);
-
-  // Handle OAuth callback — pick up code or hash from URL
-  useEffect(() => {
-    const handleCallback = async () => {
-      const params = new URLSearchParams(window.location.search);
-      const code = params.get('code');
-      if (code) {
-        const { error } = await supabase.auth.exchangeCodeForSession(code);
-        if (!error) {
-          router.replace('/');
-        }
-        return;
-      }
-      // Also handle hash fragment (implicit flow)
-      if (window.location.hash && window.location.hash.includes('access_token')) {
-        const { data } = await supabase.auth.getSession();
-        if (data.session) {
-          router.replace('/');
-        }
-      }
-    };
-    handleCallback();
-  }, []);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -51,7 +28,7 @@ export default function LoginPage() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/login` },
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
     if (error) { setErrorMsg(error.message); setLoading(false); }
   };
@@ -60,7 +37,7 @@ export default function LoginPage() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'facebook',
-      options: { redirectTo: `${window.location.origin}/login` },
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
     if (error) { setErrorMsg(error.message); setLoading(false); }
   };
