@@ -11,12 +11,20 @@ export default function AuthCallbackPage() {
 
   useEffect(() => {
     const handleAuth = async () => {
-      // Parse tokens directly from the hash fragment
+      // Parse tokens from the hash fragment without URLSearchParams
+      // (URLSearchParams can mangle tokens by converting + to spaces)
       const hash = window.location.hash.substring(1);
       if (hash) {
-        const params = new URLSearchParams(hash);
-        const accessToken = params.get('access_token');
-        const refreshToken = params.get('refresh_token');
+        const hashObj: Record<string, string> = {};
+        for (const part of hash.split('&')) {
+          const eqIdx = part.indexOf('=');
+          if (eqIdx > 0) {
+            hashObj[decodeURIComponent(part.substring(0, eqIdx))] =
+              decodeURIComponent(part.substring(eqIdx + 1));
+          }
+        }
+        const accessToken = hashObj['access_token'];
+        const refreshToken = hashObj['refresh_token'];
 
         if (accessToken && refreshToken) {
           setDebugInfo('Setting session...');
