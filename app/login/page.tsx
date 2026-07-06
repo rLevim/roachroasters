@@ -24,11 +24,19 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
+  const getRedirectUrl = () => {
+    if (typeof window === 'undefined') return '';
+    const origin = window.location.origin;
+    // Ensure we redirect to the exact URL users are on (www or non-www)
+    // to avoid domain redirects stripping auth tokens
+    return origin;
+  };
+
   const handleGoogleLogin = async () => {
     setLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin },
+      options: { redirectTo: getRedirectUrl() },
     });
     if (error) { setErrorMsg(error.message); setLoading(false); }
   };
@@ -37,7 +45,7 @@ export default function LoginPage() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'facebook',
-      options: { redirectTo: window.location.origin },
+      options: { redirectTo: getRedirectUrl() },
     });
     if (error) { setErrorMsg(error.message); setLoading(false); }
   };
