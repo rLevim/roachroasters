@@ -93,27 +93,23 @@ export default function LandingPage() {
                 step: '1',
                 title: 'Spot a Roach',
                 desc: 'Post an alert with your location and how urgent it is. Nearby Roasters get notified instantly.',
-                icon: '📍',
               },
               {
                 step: '2',
                 title: 'Get Matched',
                 desc: 'A verified Roach Roaster accepts your alert and heads your way. Chat in real-time to coordinate.',
-                icon: '🤝',
               },
               {
                 step: '3',
                 title: 'Problem Solved',
                 desc: 'The roach is gone. Rate your Roaster, pay securely, and get on with your roach-free life.',
-                icon: '✅',
               },
             ].map((item) => (
               <div
                 key={item.step}
                 className="bg-white/5 backdrop-blur rounded-2xl p-8 text-center hover:bg-white/10 transition-colors"
               >
-                <div className="text-4xl mb-4">{item.icon}</div>
-                <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-coral text-white text-sm font-bold mb-3">
+                <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-coral text-white text-lg font-bold mb-4">
                   {item.step}
                 </div>
                 <h3 className="text-xl font-bold mb-2">{item.title}</h3>
@@ -132,7 +128,6 @@ export default function LandingPage() {
           </h2>
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-gradient-to-br from-purple-mid/30 to-purple-dark/30 rounded-2xl p-8 border border-white/10">
-              <div className="text-3xl mb-4">😱</div>
               <h3 className="text-2xl font-bold mb-3">Bugaphobes</h3>
               <p className="text-purple-light mb-4 leading-relaxed">
                 Terrified of cockroaches? You&apos;re not alone. Post an alert and a
@@ -151,7 +146,6 @@ export default function LandingPage() {
               </ul>
             </div>
             <div className="bg-gradient-to-br from-coral/20 to-coral-dark/20 rounded-2xl p-8 border border-white/10">
-              <div className="text-3xl mb-4">💪</div>
               <h3 className="text-2xl font-bold mb-3">Roach Roasters</h3>
               <p className="text-purple-light mb-4 leading-relaxed">
                 Not afraid of a few roaches? Turn your bravery into cash.
