@@ -24,28 +24,22 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const getRedirectUrl = () => {
-    if (typeof window === 'undefined') return '';
-    const origin = window.location.origin;
-    // Ensure we redirect to the exact URL users are on (www or non-www)
-    // to avoid domain redirects stripping auth tokens
-    return origin;
-  };
-
   const handleGoogleLogin = async () => {
     setLoading(true);
+    const redirectTo = `${window.location.origin}/auth/callback`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: getRedirectUrl() },
+      options: { redirectTo },
     });
     if (error) { setErrorMsg(error.message); setLoading(false); }
   };
 
   const handleFacebookLogin = async () => {
     setLoading(true);
+    const redirectTo = `${window.location.origin}/auth/callback`;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'facebook',
-      options: { redirectTo: getRedirectUrl() },
+      options: { redirectTo },
     });
     if (error) { setErrorMsg(error.message); setLoading(false); }
   };
