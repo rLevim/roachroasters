@@ -98,12 +98,12 @@ export default function AlertDetailPage() {
     }
   };
 
-  const handleSelectRoaster = async (roasterId: string, roasterProfile: Profile | undefined) => {
+  const handleSelectRoaster = async (roasterId: string, _roasterProfile: Profile | undefined) => {
     const job = await createJob({
       alert_id: id,
       bugaphobe_id: userId!,
       roaster_id: roasterId,
-      price: roasterProfile?.price || 0,
+      price: 0,
     });
     if (job) {
       router.push(`/chat/${job.id}`);
@@ -198,7 +198,7 @@ export default function AlertDetailPage() {
                         )}
                       </div>
                       <p className="text-sm text-gray-500">
-                        {resp.profiles?.rating?.toFixed(1) || '0.0'} rating · {resp.profiles?.roaches_killed || 0} killed · ${resp.profiles?.price || '?'}
+                        {resp.profiles?.rating?.toFixed(1) || '0.0'} rating · {resp.profiles?.roaches_killed || 0} roasted
                       </p>
                     </div>
                   </a>

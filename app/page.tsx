@@ -195,7 +195,7 @@ export default function LandingPage() {
             </h1>
             <p className="text-lg sm:text-xl text-purple-light max-w-lg mb-10 leading-relaxed">
               RoachRoasters connects people who spot cockroaches with brave heroes
-              who eliminate them — fast, affordable, and on demand.
+              who eliminate them — fast, free, and on demand.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
               <Link
@@ -211,11 +211,11 @@ export default function LandingPage() {
                 How It Works
               </a>
             </div>
+            <p className="text-sm text-purple-light/70 mt-4">100% free to use. No fees, no subscriptions.</p>
           </div>
-          <div className="hidden md:block">
-            <PhoneMockup>
-              <MockupHome />
-            </PhoneMockup>
+          <div className="hidden md:block relative">
+            <img src="/images/bugaphobe-hero.png" alt="Scared of a cockroach" className="w-full max-w-md mx-auto rounded-3xl shadow-2xl" />
+            <img src="/images/roach-running.jpg" alt="Cartoon roach" className="absolute -bottom-6 -left-6 w-28 h-28 rounded-2xl shadow-lg border-4 border-purple-deep object-cover bg-white" />
           </div>
         </div>
       </section>
@@ -320,57 +320,53 @@ export default function LandingPage() {
             Two Sides, One Platform
           </h2>
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-gradient-to-br from-purple-mid/30 to-purple-dark/30 rounded-2xl p-8 border border-white/10">
-              <div className="w-12 h-12 rounded-xl bg-purple-mid/30 flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-purple-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                </svg>
+            <div className="bg-gradient-to-br from-purple-mid/30 to-purple-dark/30 rounded-2xl overflow-hidden border border-white/10">
+              <img src="/images/bugaphobe-hero.png" alt="Bugaphobe scared of a cockroach" className="w-full h-56 object-cover object-top" />
+              <div className="p-8">
+                <h3 className="text-2xl font-bold mb-3">Bugaphobes</h3>
+                <p className="text-purple-light mb-5 leading-relaxed">
+                  Terrified of cockroaches? You&apos;re not alone. Post an alert and a
+                  Roach Roaster will come save the day — no judgment, just relief.
+                </p>
+                <ul className="space-y-2.5 text-sm text-purple-light">
+                  <li className="flex items-center gap-3">
+                    <div className="w-5 h-5 rounded-full bg-coral/20 flex items-center justify-center shrink-0"><svg className="w-3 h-3 text-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></div>
+                    Post alerts in seconds
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-5 h-5 rounded-full bg-coral/20 flex items-center justify-center shrink-0"><svg className="w-3 h-3 text-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></div>
+                    Real-time chat with your Roaster
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-5 h-5 rounded-full bg-coral/20 flex items-center justify-center shrink-0"><svg className="w-3 h-3 text-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></div>
+                    Completely free to use
+                  </li>
+                </ul>
               </div>
-              <h3 className="text-2xl font-bold mb-3">Bugaphobes</h3>
-              <p className="text-purple-light mb-5 leading-relaxed">
-                Terrified of cockroaches? You&apos;re not alone. Post an alert and a
-                Roach Roaster will come save the day — no judgment, just relief.
-              </p>
-              <ul className="space-y-2.5 text-sm text-purple-light">
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-coral/20 flex items-center justify-center shrink-0"><svg className="w-3 h-3 text-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></div>
-                  Post alerts in seconds
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-coral/20 flex items-center justify-center shrink-0"><svg className="w-3 h-3 text-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></div>
-                  Real-time chat with your Roaster
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-coral/20 flex items-center justify-center shrink-0"><svg className="w-3 h-3 text-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></div>
-                  Secure payment after the job
-                </li>
-              </ul>
             </div>
-            <div className="bg-gradient-to-br from-coral/20 to-coral-dark/20 rounded-2xl p-8 border border-white/10">
-              <div className="w-12 h-12 rounded-xl bg-coral/20 flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
-                </svg>
+            <div className="bg-gradient-to-br from-coral/20 to-coral-dark/20 rounded-2xl overflow-hidden border border-white/10">
+              <img src="/images/roaster-hero.png" alt="Roach Roaster hero with cape" className="w-full h-56 object-cover object-top" />
+              <div className="p-8">
+                <h3 className="text-2xl font-bold mb-3">Roach Roasters</h3>
+                <p className="text-purple-light mb-5 leading-relaxed">
+                  Not afraid of a few roaches? Be a hero for those who need it.
+                  Accept alerts, eliminate roaches, and get tipped by grateful Bugaphobes.
+                </p>
+                <ul className="space-y-2.5 text-sm text-purple-light">
+                  <li className="flex items-center gap-3">
+                    <div className="w-5 h-5 rounded-full bg-coral/20 flex items-center justify-center shrink-0"><svg className="w-3 h-3 text-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></div>
+                    Help people for free or get tipped
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-5 h-5 rounded-full bg-coral/20 flex items-center justify-center shrink-0"><svg className="w-3 h-3 text-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></div>
+                    Receive "Buy a Coffee" tips
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-5 h-5 rounded-full bg-coral/20 flex items-center justify-center shrink-0"><svg className="w-3 h-3 text-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></div>
+                    Climb the leaderboard
+                  </li>
+                </ul>
               </div>
-              <h3 className="text-2xl font-bold mb-3">Roach Roasters</h3>
-              <p className="text-purple-light mb-5 leading-relaxed">
-                Not afraid of a few roaches? Turn your bravery into cash.
-                Accept alerts, eliminate roaches, and earn money on your own schedule.
-              </p>
-              <ul className="space-y-2.5 text-sm text-purple-light">
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-coral/20 flex items-center justify-center shrink-0"><svg className="w-3 h-3 text-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></div>
-                  Set your own price
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-coral/20 flex items-center justify-center shrink-0"><svg className="w-3 h-3 text-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></div>
-                  Get paid for every job
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-coral/20 flex items-center justify-center shrink-0"><svg className="w-3 h-3 text-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg></div>
-                  Climb the leaderboard
-                </li>
-              </ul>
             </div>
           </div>
         </div>
@@ -383,7 +379,7 @@ export default function LandingPage() {
             { value: '24/7', label: 'Available', icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> },
             { value: 'Fast', label: 'Response Time', icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg> },
             { value: 'Safe', label: 'Verified Roasters', icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></svg> },
-            { value: 'Easy', label: 'Secure Payments', icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" /></svg> },
+            { value: 'Free', label: 'No Hidden Fees', icon: <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" /></svg> },
           ].map((stat) => (
             <div key={stat.label}>
               <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-coral/20 text-coral mb-3">
@@ -399,18 +395,38 @@ export default function LandingPage() {
       {/* CTA */}
       <section className="py-20 text-center">
         <div className="max-w-2xl mx-auto px-6">
+          <img src="/images/roach-dead.jpg" alt="Defeated roach" className="w-40 h-auto mx-auto mb-8 rounded-2xl" />
           <h2 className="text-3xl sm:text-4xl font-black mb-4">
             Ready to live roach-free?
           </h2>
           <p className="text-purple-light text-lg mb-8">
-            Join RoachRoasters today — whether you need help or want to be the hero.
+            Join RoachRoasters today — it&apos;s completely free. Whether you need help or want to be the hero.
           </p>
           <Link
             href="/login"
             className="inline-block px-10 py-4 rounded-2xl text-lg font-extrabold bg-coral text-white hover:bg-coral-dark transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
           >
-            Sign Up Now
+            Sign Up Now — It&apos;s Free
           </Link>
+        </div>
+      </section>
+
+      {/* Support the Platform */}
+      <section className="py-12 bg-purple-ink/30">
+        <div className="max-w-2xl mx-auto px-6 text-center">
+          <p className="text-lg font-bold mb-2">Liked the service?</p>
+          <p className="text-purple-light text-sm mb-6">
+            RoachRoasters is free for everyone. If you enjoy the platform, buy me a coffee so I can keep expanding it!
+          </p>
+          <a
+            href="https://www.paypal.com/paypalme/rLevim"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-2xl font-bold bg-yellow-400 text-yellow-900 hover:bg-yellow-300 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            Buy Me a Coffee
+          </a>
         </div>
       </section>
 

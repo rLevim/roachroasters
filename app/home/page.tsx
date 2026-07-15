@@ -112,8 +112,12 @@ export default function HomePage() {
       <div className="max-w-2xl mx-auto p-4 space-y-4">
         {/* Welcome Card */}
         <div className="bg-purple-dark rounded-3xl p-6 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white text-xl font-black">
-            {(profile?.display_name || '?')[0].toUpperCase()}
+          <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white text-xl font-black overflow-hidden">
+            {profile?.photo_url ? (
+              <img src={profile.photo_url} alt={profile.display_name || ''} className="w-full h-full object-cover" />
+            ) : (
+              (profile?.display_name || '?')[0].toUpperCase()
+            )}
           </div>
           <div className="flex-1">
             <h2 className="text-2xl font-extrabold text-white">
@@ -278,22 +282,24 @@ export default function HomePage() {
               </span>
             )}
           </Link>
-          {isRoaster ? (
-            <Link href="/earnings" className="bg-white rounded-2xl p-4 text-center hover:shadow-md transition-shadow">
-              <div className="w-10 h-10 rounded-full bg-purple-light/30 flex items-center justify-center mx-auto mb-1">
-                <svg className="w-5 h-5 text-purple-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V6m0 8v2" /></svg>
-              </div>
-              <span className="text-xs font-semibold text-purple-ink">Earnings</span>
-            </Link>
-          ) : (
-            <Link href="/payment-method" className="bg-white rounded-2xl p-4 text-center hover:shadow-md transition-shadow">
-              <div className="w-10 h-10 rounded-full bg-purple-light/30 flex items-center justify-center mx-auto mb-1">
-                <svg className="w-5 h-5 text-purple-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
-              </div>
-              <span className="text-xs font-semibold text-purple-ink">Payment</span>
-            </Link>
-          )}
+          <Link href="/profile" className="bg-white rounded-2xl p-4 text-center hover:shadow-md transition-shadow">
+            <div className="w-10 h-10 rounded-full bg-purple-light/30 flex items-center justify-center mx-auto mb-1">
+              <svg className="w-5 h-5 text-purple-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+            </div>
+            <span className="text-xs font-semibold text-purple-ink">Profile</span>
+          </Link>
         </div>
+
+        {/* Support the Platform */}
+        <a
+          href="https://www.paypal.com/paypalme/rLevim"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-center hover:shadow-md transition-shadow"
+        >
+          <p className="text-sm font-bold text-yellow-800">Liked the service? Buy me a coffee!</p>
+          <p className="text-xs text-yellow-600 mt-1">Help keep RoachRoasters free for everyone</p>
+        </a>
       </div>
     </div>
   );

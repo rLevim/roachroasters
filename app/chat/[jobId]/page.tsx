@@ -167,9 +167,7 @@ export default function ChatPage() {
               <p className="text-xs text-gray-500">{statusLabels[currentJob.status] || currentJob.status}</p>
             </div>
           </a>
-          {currentJob.price > 0 && (
-            <span className="text-sm font-bold text-purple-mid">${currentJob.price}</span>
-          )}
+          <span className="text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-full">Free</span>
         </div>
       </div>
 
@@ -180,10 +178,10 @@ export default function ChatPage() {
             {/* Pending = negotiation phase */}
             {!isRoaster && currentJob.status === 'pending' && (
               <Button
-                title={`Accept Deal — $${currentJob.price + currentJob.platform_fee}`}
+                title="Accept — Roaster is coming!"
                 onClick={async () => {
                   await updateJobStatus(jobId, 'accepted');
-                  await sendMessage(jobId, `Deal accepted! $${currentJob.price} + $${currentJob.platform_fee} fee. Roaster is on the way.`, 'system');
+                  await sendMessage(jobId, 'Deal accepted! Roaster is on the way.', 'system');
                   addToast('Deal accepted!', 'success');
                 }}
                 variant="coral"
@@ -397,7 +395,7 @@ export default function ChatPage() {
           {/* System message at start */}
           <div className="text-center">
             <p className="text-xs text-gray-400 bg-gray-100 rounded-full px-4 py-1 inline-block">
-              Job created · ${currentJob.price} + ${currentJob.platform_fee} fee
+              Job created · Chat to coordinate
             </p>
           </div>
 
@@ -435,7 +433,16 @@ export default function ChatPage() {
             }
 
             return (
-              <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
+              <div key={msg.id} className={`flex items-end gap-2 ${isMine ? 'justify-end' : 'justify-start'}`}>
+                {!isMine && (
+                  <div className="w-7 h-7 rounded-full bg-purple-mid flex items-center justify-center text-white text-xs font-bold shrink-0 overflow-hidden">
+                    {otherProfile?.photo_url ? (
+                      <img src={otherProfile.photo_url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      otherName.charAt(0).toUpperCase()
+                    )}
+                  </div>
+                )}
                 <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
                   isMine
                     ? 'bg-purple-mid text-white rounded-br-md'
@@ -481,6 +488,19 @@ export default function ChatPage() {
         <div className="bg-green-50 border-t border-green-200 px-4 py-4">
           <div className="max-w-2xl mx-auto space-y-4">
             <p className="text-green-700 font-bold text-center">Job completed!</p>
+
+            {/* Buy a Coffee for the Roaster */}
+            {!isRoaster && otherProfile?.paypal_email && (
+              <a
+                href={`https://www.paypal.com/paypalme/${otherProfile.paypal_email}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-center hover:shadow-md transition-shadow"
+              >
+                <p className="text-sm font-bold text-yellow-800">Happy with the service? Buy {otherName} a coffee!</p>
+                <p className="text-xs text-yellow-600 mt-1">Show your appreciation with a tip</p>
+              </a>
+            )}
 
             {/* Other person's review of you */}
             {otherReview && (
