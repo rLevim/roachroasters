@@ -78,10 +78,22 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file || !userId) return;
 
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+    const MAX_SIZE = 5 * 1024 * 1024;
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setUploadError('Only JPG, PNG, and WebP images are allowed.');
+      return;
+    }
+    if (file.size > MAX_SIZE) {
+      setUploadError('Image must be under 5 MB.');
+      return;
+    }
+
     setUploading(true);
     setUploadError(null);
     try {
-      const ext = file.name.split('.').pop();
+      const EXT_MAP: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+      const ext = EXT_MAP[file.type];
       const filePath = `${userId}.${ext}`;
 
       const { error: err } = await supabase.storage

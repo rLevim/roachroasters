@@ -22,12 +22,24 @@ export default function VerifyPage() {
     const file = e.target.files?.[0];
     if (!file || !userId) return;
 
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+    const MAX_SIZE = 10 * 1024 * 1024;
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setError('Only JPG, PNG, and WebP images are allowed.');
+      return;
+    }
+    if (file.size > MAX_SIZE) {
+      setError('Image must be under 10 MB.');
+      return;
+    }
+
     setPreviewUrl(URL.createObjectURL(file));
     setUploading(true);
     setError(null);
 
     try {
-      const ext = file.name.split('.').pop();
+      const EXT_MAP: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+      const ext = EXT_MAP[file.type];
       const filePath = `verification/${userId}.${ext}`;
 
       const { error: uploadErr } = await supabase.storage

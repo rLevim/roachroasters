@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { AuthInitializer } from '@/components/AuthInitializer';
+import { NotificationInit } from '@/components/NotificationInit';
 import { ToastContainer } from '@/components/Toast';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="bg-lavender min-h-screen font-sans antialiased">
         <AuthInitializer />
+        <NotificationInit />
         <ErrorBoundary>
           {children}
         </ErrorBoundary>

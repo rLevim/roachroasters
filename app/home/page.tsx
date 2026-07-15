@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase';
 import { getLevelForXp, getNextLevel } from '@/constants/badges';
 import { Navbar } from '@/components/Navbar';
 import type { RoachAlert } from '@/types/database';
+import { showLocalNotification } from '@/lib/notifications';
 
 export default function HomePage() {
   const profile = useAuthStore((s) => s.profile);
@@ -65,7 +66,18 @@ export default function HomePage() {
     if (isRoaster) {
       const alertChannel = supabase
         .channel('home-alerts')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'roach_alerts' }, () => {
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'roach_alerts' }, (payload) => {
+          fetchNearbyAlerts();
+          const alert = payload.new as RoachAlert;
+          if (alert.bugaphobe_id !== userId) {
+            showLocalNotification(
+              'New Roach Alert nearby!',
+              alert.description || 'A bugaphobe needs your help!',
+              `/alerts/${alert.id}`,
+            );
+          }
+        })
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'roach_alerts' }, () => {
           fetchNearbyAlerts();
         })
         .subscribe();
@@ -83,6 +95,23 @@ export default function HomePage() {
         })
         .subscribe();
       channels.push(myAlertChannel);
+    }
+
+    if (isBugaphobe && userId) {
+      const msgChannel = supabase
+        .channel('home-bugaphobe-msgs')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
+          const msg = payload.new as { sender_id: string; content: string; job_id: string; message_type: string };
+          if (msg.sender_id !== userId && msg.message_type !== 'system') {
+            showLocalNotification(
+              'New message from your Roach Roaster',
+              msg.content,
+              `/chat/${msg.job_id}`,
+            );
+          }
+        })
+        .subscribe();
+      channels.push(msgChannel);
     }
 
     const jobChannel = supabase

@@ -7,35 +7,43 @@ import { supabase } from '@/lib/supabase';
 export default function AuthCallbackPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
-  const [debugInfo, setDebugInfo] = useState('Initializing...');
 
   useEffect(() => {
     const handleAuth = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+
+      if (code) {
+        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+        if (!exchangeError) {
+          router.replace('/');
+          return;
+        }
+        setError(exchangeError.message);
+        return;
+      }
+
+      // Fallback: check for hash-based tokens (legacy implicit flow links)
       const hash = window.location.hash.substring(1);
       if (hash) {
-        const params = new URLSearchParams(hash);
-        const accessToken = params.get('access_token');
-        const refreshToken = params.get('refresh_token');
+        const hashParams = new URLSearchParams(hash);
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
         if (accessToken && refreshToken) {
-          setDebugInfo('Setting session...');
-          try {
-            const { error: sessionError } = await supabase.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken,
-            });
-            if (!sessionError) {
-              router.replace('/');
-              return;
-            }
-            setError(sessionError.message);
-          } catch (e: unknown) {
-            setError(e instanceof Error ? e.message : String(e));
+          const { error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+          if (!sessionError) {
+            router.replace('/');
+            return;
           }
+          setError(sessionError.message);
           return;
         }
       }
 
-      // Fallback: wait for Supabase to auto-detect session from URL
+      // Last resort: wait for Supabase to auto-detect session
       await new Promise(r => setTimeout(r, 1500));
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
@@ -67,7 +75,6 @@ export default function AuthCallbackPage() {
           <div>
             <img src="/logo.png" alt="RoachRoasters" className="w-32 h-32 mx-auto object-contain" />
             <p className="text-white font-semibold mt-4">Signing you in...</p>
-            <p className="text-white/50 text-xs mt-2">{debugInfo}</p>
             <div className="mt-4 w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
           </div>
         )}

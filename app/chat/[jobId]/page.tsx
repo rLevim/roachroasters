@@ -9,6 +9,7 @@ import { Navbar } from '@/components/Navbar';
 import { Button } from '@/components/Button';
 import { useToastStore } from '@/components/Toast';
 import type { Profile, Message, Review } from '@/types/database';
+import { showLocalNotification } from '@/lib/notifications';
 
 const statusLabels: Record<string, string> = {
   pending: 'Negotiating — discuss details',
@@ -104,7 +105,20 @@ export default function ChatPage() {
     })();
   }, [jobId, userId, currentJob?.status]);
 
+  const prevMessageCount = useRef(0);
   useEffect(() => {
+    if (messages.length > prevMessageCount.current && prevMessageCount.current > 0) {
+      const latest = messages[messages.length - 1];
+      if (latest.sender_id !== userId && latest.message_type !== 'system') {
+        const name = otherProfile?.display_name || 'Someone';
+        showLocalNotification(
+          `New message from ${name}`,
+          latest.content,
+          `/chat/${jobId}`,
+        );
+      }
+    }
+    prevMessageCount.current = messages.length;
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
