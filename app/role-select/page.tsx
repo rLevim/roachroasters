@@ -52,7 +52,7 @@ export default function RoleSelectPage() {
             <span className="text-5xl block mb-2"> </span>
             <h3 className="text-xl font-extrabold text-purple-ink">Roach Roaster</h3>
             <p className="text-gray-500 text-sm mt-1">
-              Cockroaches don&apos;t scare me! I&apos;ll roast &apos;em for a fee.
+              Cockroaches don&apos;t scare me! I&apos;ll help others and be a hero.
             </p>
           </button>
         </div>

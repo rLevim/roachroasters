@@ -22,8 +22,7 @@ export default function ProfilePage() {
   const [displayName, setDisplayName] = useState('');
   const [bio, setBio] = useState('');
   const [city, setCity] = useState('');
-  const [price, setPrice] = useState('');
-  const [paypalEmail, setPaypalEmail] = useState('');
+  const [paypalMe, setPaypalMe] = useState('');
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -39,8 +38,7 @@ export default function ProfilePage() {
       setDisplayName(profile.display_name || '');
       setBio(profile.bio || '');
       setCity(profile.city || '');
-      setPrice(profile.price?.toString() || '');
-      setPaypalEmail(profile.paypal_email || '');
+      setPaypalMe(profile.paypal_me || '');
       setPhotoUrl(profile.photo_url);
     }
   }, [profile]);
@@ -131,8 +129,7 @@ export default function ProfilePage() {
         city: city.trim() || null,
       };
       if (isRoaster) {
-        updates.price = price ? parseFloat(price) : null;
-        updates.paypal_email = paypalEmail.trim() || null;
+        updates.paypal_me = paypalMe.trim() || null;
       }
       await updateProfile(updates);
       setEditing(false);
@@ -294,12 +291,8 @@ export default function ProfilePage() {
             {isRoaster && (
               <div className="border-t border-gray-100 pt-3 space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Price per job</span>
-                  <span className="font-bold text-purple-ink">{profile.price ? `$${profile.price}` : 'Not set'}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">PayPal</span>
-                  <span className="font-bold text-purple-ink">{profile.paypal_email || 'Not set'}</span>
+                  <span className="text-gray-500">PayPal.me</span>
+                  <span className="font-bold text-purple-ink">{profile.paypal_me || 'Not set'}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">XP</span>
@@ -366,31 +359,22 @@ export default function ProfilePage() {
             </div>
 
             {isRoaster && (
-              <>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-600 mb-1">Price per job ($)</label>
+              <div>
+                <label className="block text-sm font-semibold text-gray-600 mb-1">PayPal.me Username</label>
+                <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-purple-mid">
+                  <span className="text-sm text-gray-400 pl-4 shrink-0">paypal.me/</span>
                   <input
-                    type="number"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-mid"
-                    placeholder="e.g. 15"
-                    min="0"
-                    step="1"
+                    type="text"
+                    value={paypalMe}
+                    onChange={(e) => setPaypalMe(e.target.value)}
+                    className="flex-1 px-1 py-3 text-sm focus:outline-none"
+                    placeholder="yourUsername"
                   />
                 </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-600 mb-1">PayPal Email (for payouts)</label>
-                  <input
-                    type="email"
-                    value={paypalEmail}
-                    onChange={(e) => setPaypalEmail(e.target.value)}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-mid"
-                    placeholder="your@email.com"
-                  />
-                </div>
-              </>
+                <p className="text-xs text-gray-400 mt-1">
+                  Bugaphobes can send you a &quot;Buy a Coffee&quot; tip after you help them.
+                </p>
+              </div>
             )}
 
             <div className="flex gap-3">
@@ -409,8 +393,7 @@ export default function ProfilePage() {
                     setDisplayName(profile.display_name || '');
                     setBio(profile.bio || '');
                     setCity(profile.city || '');
-                    setPrice(profile.price?.toString() || '');
-                    setPaypalEmail(profile.paypal_email || '');
+                    setPaypalMe(profile.paypal_me || '');
                   }
                 }}
                 variant="ghost"

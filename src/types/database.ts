@@ -20,6 +20,7 @@ export interface Profile {
   roaches_killed: number;
   price: number | null;
   paypal_email: string | null;
+  paypal_me: string | null;
   stripe_account_id: string | null;
   stripe_onboarded: boolean;
   stripe_payment_method_id: string | null;

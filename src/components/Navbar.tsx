@@ -97,9 +97,8 @@ export function Navbar() {
           {navLink('/home', 'Home')}
           {navLink('/browse', isBugaphobe ? 'Roasters' : 'Alerts', isRoaster ? alertCount : undefined)}
           {navLink('/activity', 'Activity', activeJobCount)}
-          {isRoaster && navLink('/earnings', 'Earnings')}
-          {isBugaphobe && navLink('/payment-method', 'Payment')}
-          {navLink('/profile', 'Profile')}
+          {isRoaster && navLink('/earnings', 'Stats')}
+                    {navLink('/profile', 'Profile')}
           <button
             onClick={handleSignOut}
             className="ml-2 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm font-semibold cursor-pointer"
@@ -130,9 +129,8 @@ export function Navbar() {
           {navLink('/home', 'Home')}
           {navLink('/browse', isBugaphobe ? 'Roasters' : 'Alerts', isRoaster ? alertCount : undefined)}
           {navLink('/activity', 'Activity', activeJobCount)}
-          {isRoaster && navLink('/earnings', 'Earnings')}
-          {isBugaphobe && navLink('/payment-method', 'Payment')}
-          {navLink('/profile', 'Profile')}
+          {isRoaster && navLink('/earnings', 'Stats')}
+                    {navLink('/profile', 'Profile')}
           {navLink('/leaderboard', 'Leaderboard')}
           {navLink('/support', 'Help & Support')}
           {navLink('/verify', 'Get Verified')}

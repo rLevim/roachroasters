@@ -504,9 +504,9 @@ export default function ChatPage() {
             <p className="text-green-700 font-bold text-center">Job completed!</p>
 
             {/* Buy a Coffee for the Roaster */}
-            {!isRoaster && otherProfile?.paypal_email && (
+            {!isRoaster && otherProfile?.paypal_me && (
               <a
-                href={`https://www.paypal.com/paypalme/${otherProfile.paypal_email}`}
+                href={`https://www.paypal.me/${otherProfile.paypal_me}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-center hover:shadow-md transition-shadow"
