@@ -10,43 +10,22 @@ export default function AuthCallbackPage() {
 
   useEffect(() => {
     const handleAuth = async () => {
-      const params = new URLSearchParams(window.location.search);
-      const code = params.get('code');
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-      if (code) {
-        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-        if (!exchangeError) {
-          router.replace('/');
-          return;
-        }
-        setError(exchangeError.message);
+      if (sessionError) {
+        setError(sessionError.message);
         return;
       }
 
-      // Fallback: check for hash-based tokens (legacy implicit flow links)
-      const hash = window.location.hash.substring(1);
-      if (hash) {
-        const hashParams = new URLSearchParams(hash);
-        const accessToken = hashParams.get('access_token');
-        const refreshToken = hashParams.get('refresh_token');
-        if (accessToken && refreshToken) {
-          const { error: sessionError } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken,
-          });
-          if (!sessionError) {
-            router.replace('/');
-            return;
-          }
-          setError(sessionError.message);
-          return;
-        }
+      if (session) {
+        router.replace('/');
+        return;
       }
 
-      // Last resort: wait for Supabase to auto-detect session
-      await new Promise(r => setTimeout(r, 1500));
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
+      // Give detectSessionInUrl a moment to process the hash
+      await new Promise(r => setTimeout(r, 2000));
+      const { data: { session: retrySession } } = await supabase.auth.getSession();
+      if (retrySession) {
         router.replace('/');
         return;
       }
