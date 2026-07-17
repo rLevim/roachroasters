@@ -10,8 +10,10 @@ import { getLevelForXp, getNextLevel } from '@/constants/badges';
 import { Navbar } from '@/components/Navbar';
 import type { RoachAlert } from '@/types/database';
 import { showLocalNotification } from '@/lib/notifications';
+import { useI18n } from '@/lib/i18n';
 
 export default function HomePage() {
+  const { t } = useI18n();
   const profile = useAuthStore((s) => s.profile);
   const userId = useAuthStore((s) => s.user?.id);
   const isBugaphobe = profile?.role === 'bugaphobe';
@@ -150,10 +152,10 @@ export default function HomePage() {
           </div>
           <div className="flex-1">
             <h2 className="text-2xl font-extrabold text-white">
-              Hey, {profile?.display_name || 'there'}!
+              {t('home.welcome')} {profile?.display_name || 'there'}!
             </h2>
             <p className="text-purple-light text-sm">
-              {isBugaphobe ? 'Bugaphobe' : getLevelForXp(profile?.xp || 0)}
+              {isBugaphobe ? t('home.bugaphobe') : getLevelForXp(profile?.xp || 0)}
             </p>
           </div>
           {profile?.is_verified && (
@@ -219,15 +221,15 @@ export default function HomePage() {
           <div className="grid grid-cols-3 gap-3">
             <div className="bg-white rounded-2xl p-4 text-center">
               <p className="text-3xl font-black text-purple-ink">{profile?.bravery_score || 0}</p>
-              <p className="text-xs text-gray-500 mt-1">Bravery Score</p>
+              <p className="text-xs text-gray-500 mt-1">{t('home.bravery')}</p>
             </div>
             <div className="bg-white rounded-2xl p-4 text-center">
               <p className="text-3xl font-black text-purple-ink">{profile?.total_reviews || 0}</p>
-              <p className="text-xs text-gray-500 mt-1">Reviews</p>
+              <p className="text-xs text-gray-500 mt-1">{t('home.reviews')}</p>
             </div>
             <div className="bg-white rounded-2xl p-4 text-center">
               <p className="text-3xl font-black text-purple-ink">{profile?.rating?.toFixed(1) || '0.0'}</p>
-              <p className="text-xs text-gray-500 mt-1">Rating</p>
+              <p className="text-xs text-gray-500 mt-1">{t('home.rating')}</p>
             </div>
           </div>
         )}
@@ -238,14 +240,14 @@ export default function HomePage() {
             href="/alerts/create"
             className="block bg-coral text-white text-center text-lg font-extrabold py-4 rounded-2xl hover:bg-coral-dark transition-colors"
           >
-            Post a Roach Alert
+            {t('home.postAlert')}
           </Link>
         )}
 
         {/* My Alerts (Bugaphobe) */}
         {isBugaphobe && myAlerts.length > 0 && (
           <div className="space-y-3">
-            <h3 className="text-lg font-extrabold text-purple-ink">My Alerts</h3>
+            <h3 className="text-lg font-extrabold text-purple-ink">{t('home.myAlerts')}</h3>
             {myAlerts.map((alert) => (
               <Link
                 key={alert.id}
@@ -287,13 +289,13 @@ export default function HomePage() {
             <div className="w-10 h-10 rounded-full bg-purple-light/30 flex items-center justify-center mx-auto mb-1">
               <svg className="w-5 h-5 text-purple-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m6 0h6m-6 0V9a2 2 0 012-2h2a2 2 0 012 2v10m6 0v-4a2 2 0 00-2-2h-2a2 2 0 00-2 2v4" /></svg>
             </div>
-            <span className="text-xs font-semibold text-purple-ink">Leaderboard</span>
+            <span className="text-xs font-semibold text-purple-ink">{t('nav.leaderboard')}</span>
           </Link>
           <Link href="/browse" className="bg-white rounded-2xl p-4 text-center hover:shadow-md transition-shadow relative">
             <div className="w-10 h-10 rounded-full bg-purple-light/30 flex items-center justify-center mx-auto mb-1">
               <svg className="w-5 h-5 text-purple-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             </div>
-            <span className="text-xs font-semibold text-purple-ink">{isBugaphobe ? 'Browse' : 'Alerts'}</span>
+            <span className="text-xs font-semibold text-purple-ink">{isBugaphobe ? t('nav.roasters') : t('nav.alerts')}</span>
             {isRoaster && openAlertCount > 0 && (
               <span className="absolute top-2 right-2 bg-coral text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">
                 {openAlertCount}
@@ -315,7 +317,7 @@ export default function HomePage() {
             <div className="w-10 h-10 rounded-full bg-purple-light/30 flex items-center justify-center mx-auto mb-1">
               <svg className="w-5 h-5 text-purple-ink" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
             </div>
-            <span className="text-xs font-semibold text-purple-ink">Profile</span>
+            <span className="text-xs font-semibold text-purple-ink">{t('nav.profile')}</span>
           </Link>
         </div>
 
@@ -326,8 +328,8 @@ export default function HomePage() {
           rel="noopener noreferrer"
           className="block bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-center hover:shadow-md transition-shadow"
         >
-          <p className="text-sm font-bold text-yellow-800">Liked the service? Buy me a coffee!</p>
-          <p className="text-xs text-yellow-600 mt-1">Help keep RoachRoasters free for everyone</p>
+          <p className="text-sm font-bold text-yellow-800">{t('landing.support.title')} {t('landing.support.button')}!</p>
+          <p className="text-xs text-yellow-600 mt-1">{t('landing.support.desc')}</p>
         </a>
       </div>
     </div>

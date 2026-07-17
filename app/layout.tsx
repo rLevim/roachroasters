@@ -4,6 +4,7 @@ import { AuthInitializer } from '@/components/AuthInitializer';
 import { NotificationInit } from '@/components/NotificationInit';
 import { ToastContainer } from '@/components/Toast';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { ClientProviders } from '@/components/ClientProviders';
 
 export const metadata: Metadata = {
   title: 'RoachRoasters - Fear No Roach',
@@ -29,12 +30,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="bg-lavender min-h-screen font-sans antialiased">
-        <AuthInitializer />
-        <NotificationInit />
-        <ErrorBoundary>
-          {children}
-        </ErrorBoundary>
-        <ToastContainer />
+        <ClientProviders>
+          <AuthInitializer />
+          <NotificationInit />
+          <ErrorBoundary>
+            {children}
+          </ErrorBoundary>
+          <ToastContainer />
+        </ClientProviders>
       </body>
     </html>
   );

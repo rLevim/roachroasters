@@ -6,6 +6,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { useJobStore } from '@/stores/jobStore';
 import { supabase } from '@/lib/supabase';
 import { useRouter, usePathname } from 'next/navigation';
+import { useI18n } from '@/lib/i18n';
 
 export function Navbar() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export function Navbar() {
   const isRoaster = profile?.role === 'roach_roaster';
   const { myJobs, fetchMyJobs } = useJobStore();
 
+  const { t, lang, setLang } = useI18n();
   const [alertCount, setAlertCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -94,16 +96,23 @@ export function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-1">
-          {navLink('/home', 'Home')}
-          {navLink('/browse', isBugaphobe ? 'Roasters' : 'Alerts', isRoaster ? alertCount : undefined)}
-          {navLink('/activity', 'Activity', activeJobCount)}
-          {isRoaster && navLink('/earnings', 'Stats')}
-                    {navLink('/profile', 'Profile')}
+          {navLink('/home', t('nav.home'))}
+          {navLink('/browse', isBugaphobe ? t('nav.roasters') : t('nav.alerts'), isRoaster ? alertCount : undefined)}
+          {navLink('/activity', t('nav.activity'), activeJobCount)}
+          {isRoaster && navLink('/earnings', t('nav.stats'))}
+          {navLink('/profile', t('nav.profile'))}
+          <button
+            onClick={() => setLang(lang === 'en' ? 'he' : 'en')}
+            className="px-2 py-1.5 rounded-lg hover:bg-white/10 text-sm font-semibold cursor-pointer"
+            title={lang === 'en' ? 'עברית' : 'English'}
+          >
+            {lang === 'en' ? 'HE' : 'EN'}
+          </button>
           <button
             onClick={handleSignOut}
-            className="ml-2 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm font-semibold cursor-pointer"
+            className="ml-1 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm font-semibold cursor-pointer"
           >
-            Sign Out
+            {t('nav.signOut')}
           </button>
         </div>
 
@@ -126,19 +135,25 @@ export function Navbar() {
       {/* Mobile menu */}
       {menuOpen && (
         <div className="md:hidden bg-purple-deep border-t border-white/10 px-4 py-3 space-y-1 animate-slide-up">
-          {navLink('/home', 'Home')}
-          {navLink('/browse', isBugaphobe ? 'Roasters' : 'Alerts', isRoaster ? alertCount : undefined)}
-          {navLink('/activity', 'Activity', activeJobCount)}
-          {isRoaster && navLink('/earnings', 'Stats')}
-                    {navLink('/profile', 'Profile')}
-          {navLink('/leaderboard', 'Leaderboard')}
-          {navLink('/support', 'Help & Support')}
-          {navLink('/verify', 'Get Verified')}
+          {navLink('/home', t('nav.home'))}
+          {navLink('/browse', isBugaphobe ? t('nav.roasters') : t('nav.alerts'), isRoaster ? alertCount : undefined)}
+          {navLink('/activity', t('nav.activity'), activeJobCount)}
+          {isRoaster && navLink('/earnings', t('nav.stats'))}
+          {navLink('/profile', t('nav.profile'))}
+          {navLink('/leaderboard', t('nav.leaderboard'))}
+          {navLink('/support', t('nav.support'))}
+          {navLink('/verify', t('nav.verify'))}
+          <button
+            onClick={() => setLang(lang === 'en' ? 'he' : 'en')}
+            className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 text-sm font-semibold cursor-pointer"
+          >
+            {lang === 'en' ? '🇮🇱 עברית' : '🇺🇸 English'}
+          </button>
           <button
             onClick={handleSignOut}
             className="w-full text-left px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-sm font-semibold cursor-pointer mt-2"
           >
-            Sign Out
+            {t('nav.signOut')}
           </button>
         </div>
       )}

@@ -4,11 +4,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/Button';
+import { useI18n } from '@/lib/i18n';
 import type { UserRole } from '@/types/database';
 
 export default function RoleSelectPage() {
   const router = useRouter();
   const selectRole = useAuthStore((s) => s.selectRole);
+  const { t, lang } = useI18n();
   const [selected, setSelected] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -26,8 +28,8 @@ export default function RoleSelectPage() {
   return (
     <div className="min-h-screen bg-purple-deep flex items-center justify-center p-6">
       <div className="w-full max-w-lg text-center">
-        <h1 className="text-4xl font-black text-white">Who Are You?</h1>
-        <p className="text-purple-light mt-2 mb-8">Choose your role to get started</p>
+        <h1 className="text-4xl font-black text-white">{t('role.title')}</h1>
+        <p className="text-purple-light mt-2 mb-8">{t('role.subtitle')}</p>
 
         <div className="space-y-4 mb-8">
           <button
@@ -37,9 +39,9 @@ export default function RoleSelectPage() {
             }`}
           >
             <span className="text-5xl block mb-2"> </span>
-            <h3 className="text-xl font-extrabold text-purple-ink">Bugaphobe</h3>
+            <h3 className="text-xl font-extrabold text-purple-ink">{t('landing.twoSides.bugaphobes')}</h3>
             <p className="text-gray-500 text-sm mt-1">
-              I&apos;m afraid of cockroaches and need someone brave to come deal with them!
+              {t('role.bugaphobe')}
             </p>
           </button>
 
@@ -50,9 +52,9 @@ export default function RoleSelectPage() {
             }`}
           >
             <span className="text-5xl block mb-2"> </span>
-            <h3 className="text-xl font-extrabold text-purple-ink">Roach Roaster</h3>
+            <h3 className="text-xl font-extrabold text-purple-ink">{t('landing.twoSides.roasters')}</h3>
             <p className="text-gray-500 text-sm mt-1">
-              Cockroaches don&apos;t scare me! I&apos;ll help others and be a hero.
+              {t('role.roaster')}
             </p>
           </button>
         </div>
