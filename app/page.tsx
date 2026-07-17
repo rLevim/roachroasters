@@ -209,25 +209,8 @@ export default function LandingPage() {
             </div>
             <p className="text-sm text-purple-light/70 mt-4">100% free to use. No fees, no subscriptions.</p>
           </div>
-          <div className="hidden md:flex justify-center">
-            <div className="relative">
-              <div className="w-72 h-72 rounded-full bg-coral/10 flex items-center justify-center">
-                <svg className="w-40 h-40 text-coral/60" viewBox="0 0 120 120" fill="none">
-                  <circle cx="60" cy="40" r="20" fill="currentColor" opacity="0.3" />
-                  <circle cx="60" cy="40" r="12" fill="currentColor" opacity="0.5" />
-                  <path d="M40 85 C40 65 80 65 80 85" stroke="currentColor" strokeWidth="3" fill="currentColor" opacity="0.3" />
-                  <circle cx="55" cy="38" r="2" fill="white" />
-                  <circle cx="65" cy="38" r="2" fill="white" />
-                  <path d="M54 46 Q60 50 66 46" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-                  <path d="M60 60 L60 85" stroke="currentColor" strokeWidth="2" opacity="0.3" />
-                  <path d="M50 70 L40 60" stroke="currentColor" strokeWidth="2" opacity="0.3" strokeLinecap="round" />
-                  <path d="M70 70 L80 60" stroke="currentColor" strokeWidth="2" opacity="0.3" strokeLinecap="round" />
-                </svg>
-              </div>
-              <div className="absolute -top-2 -right-2 bg-coral text-white rounded-full px-3 py-1 text-sm font-bold shadow-lg animate-bounce">
-                FREE
-              </div>
-            </div>
+          <div className="hidden md:block relative">
+            <img src="/images/bugaphobe-hero.png" alt="Scared of a cockroach" className="w-full max-w-md mx-auto rounded-3xl shadow-2xl" />
           </div>
         </div>
       </section>
@@ -333,16 +316,8 @@ export default function LandingPage() {
           </h2>
           <div className="grid md:grid-cols-2 gap-4 sm:gap-8">
             <div className="bg-gradient-to-br from-purple-mid/30 to-purple-dark/30 rounded-2xl overflow-hidden border border-white/10">
-              <div className="h-32 sm:h-56 bg-purple-mid/20 flex items-center justify-center">
-                <svg className="w-20 h-20 sm:w-28 sm:h-28 text-purple-light/40" viewBox="0 0 100 100" fill="none">
-                  <circle cx="50" cy="35" r="15" fill="currentColor" opacity="0.5" />
-                  <path d="M30 80 C30 60 70 60 70 80" fill="currentColor" opacity="0.4" />
-                  <path d="M42 33 L38 28" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                  <path d="M58 33 L62 28" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                  <path d="M44 38 Q50 42 56 38" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-                  <path d="M35 55 C30 50 25 55 30 60" stroke="currentColor" strokeWidth="1.5" fill="none" opacity="0.6" />
-                  <path d="M65 55 C70 50 75 55 70 60" stroke="currentColor" strokeWidth="1.5" fill="none" opacity="0.6" />
-                </svg>
+              <div className="h-32 sm:h-56 overflow-hidden">
+                <img src="/images/bugaphobe-hero.png" alt="Bugaphobe" className="w-full h-full object-cover" />
               </div>
               <div className="p-5 sm:p-8">
                 <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Bugaphobes</h3>
@@ -367,18 +342,8 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="bg-gradient-to-br from-coral/20 to-coral-dark/20 rounded-2xl overflow-hidden border border-white/10">
-              <div className="h-32 sm:h-56 bg-coral/10 flex items-center justify-center">
-                <svg className="w-20 h-20 sm:w-28 sm:h-28 text-coral/40" viewBox="0 0 100 100" fill="none">
-                  <circle cx="50" cy="35" r="15" fill="currentColor" opacity="0.5" />
-                  <path d="M30 80 C30 60 70 60 70 80" fill="currentColor" opacity="0.4" />
-                  <circle cx="45" cy="33" r="2" fill="currentColor" opacity="0.8" />
-                  <circle cx="55" cy="33" r="2" fill="currentColor" opacity="0.8" />
-                  <path d="M44 40 Q50 44 56 40" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
-                  <path d="M38 18 L42 10 L50 15" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6" />
-                  <path d="M62 18 L58 10 L50 15" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.6" />
-                  <path d="M70 50 L80 45" stroke="currentColor" strokeWidth="3" strokeLinecap="round" opacity="0.5" />
-                  <path d="M80 45 L85 40" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
-                </svg>
+              <div className="h-32 sm:h-56 overflow-hidden">
+                <img src="/images/roaster-hero.png" alt="Roach Roaster" className="w-full h-full object-cover" />
               </div>
               <div className="p-5 sm:p-8">
                 <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">Roach Roasters</h3>
@@ -429,10 +394,8 @@ export default function LandingPage() {
       {/* CTA */}
       <section className="py-14 sm:py-20 text-center">
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
-          <div className="w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-6 sm:mb-8 rounded-full bg-coral/10 flex items-center justify-center">
-            <svg className="w-12 h-12 sm:w-16 sm:h-16 text-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.745 3.745 0 011.043 3.296A3.745 3.745 0 0121 12z" />
-            </svg>
+          <div className="w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-6 sm:mb-8 rounded-full overflow-hidden shadow-lg">
+            <img src="/images/roach-dead.jpg" alt="Problem solved" className="w-full h-full object-cover" />
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-3 sm:mb-4">
             Ready to live roach-free?
