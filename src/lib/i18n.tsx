@@ -131,7 +131,7 @@ const en: Translations = {
 const he: Translations = {
   // Navbar
   'nav.home': 'בית',
-  'nav.roasters': 'ג׳וק-קוטלים',
+  'nav.roasters': 'רוסטרים',
   'nav.alerts': 'התראות',
   'nav.activity': 'פעילות',
   'nav.stats': 'סטטיסטיקה',
@@ -144,71 +144,71 @@ const he: Translations = {
   // Landing page
   'landing.login': 'התחברות',
   'landing.signup': 'הרשמה',
-  'landing.hero.title1': 'ראית ג׳וק?',
-  'landing.hero.title2': 'נטפל בזה.',
-  'landing.hero.desc': 'ג׳וק-קוטל מחבר בין אנשים שמבחינים בג׳וקים לגיבורים אמיצים שמסלקים אותם — מהר, בחינם, ולפי דרישה.',
-  'landing.hero.cta': 'התחל בחינם',
+  'landing.hero.title1': 'יש לך ג׳וק?',
+  'landing.hero.title2': 'יש לנו פתרון.',
+  'landing.hero.desc': 'רואצ׳ רוסטרס מחבר בין אנשים שגילו ג׳וק לגיבורים שמוכנים לבוא ולסלק אותו — מהר, בחינם, ובלחיצת כפתור.',
+  'landing.hero.cta': 'בואו נתחיל',
   'landing.hero.howItWorks': 'איך זה עובד',
-  'landing.hero.free': '100% חינם. ללא עמלות, ללא מנויים.',
+  'landing.hero.free': '100% בחינם. בלי עמלות, בלי מנויים.',
 
   'landing.howItWorks.title': 'איך זה עובד',
-  'landing.howItWorks.desc': 'מרגע שמזהים ג׳וק ועד שמטפלים בו — כל התהליך לוקח דקות.',
-  'landing.howItWorks.step1.title': 'זיהית ג׳וק',
-  'landing.howItWorks.step1.desc': 'פרסם התראה עם המיקום שלך ורמת הדחיפות. ג׳וק-קוטלים בסביבה מקבלים הודעה מיידית.',
-  'landing.howItWorks.step2.title': 'התאמה',
-  'landing.howItWorks.step2.desc': 'ג׳וק-קוטל מאומת מקבל את ההתראה ויוצא לדרך. שוחחו בצ׳אט בזמן אמת לתיאום.',
-  'landing.howItWorks.step3.title': 'בעיה נפתרה',
-  'landing.howItWorks.step3.desc': 'הג׳וק נעלם. דרגו את הג׳וק-קוטל שלכם והמשיכו בחיים ללא ג׳וקים.',
+  'landing.howItWorks.desc': 'מהרגע שגילית ג׳וק ועד שמישהו מטפל בו — הכל לוקח כמה דקות.',
+  'landing.howItWorks.step1.title': 'גילית ג׳וק',
+  'landing.howItWorks.step1.desc': 'שלח התראה עם המיקום שלך. רוסטרים בסביבה מקבלים התראה מיד.',
+  'landing.howItWorks.step2.title': 'מישהו בדרך',
+  'landing.howItWorks.step2.desc': 'רוסטר קולט את ההתראה ויוצא אליך. תתאמו ביניכם בצ׳אט בזמן אמת.',
+  'landing.howItWorks.step3.title': 'נגמר הסיפור',
+  'landing.howItWorks.step3.desc': 'הג׳וק טופל. תנו דירוג לרוסטר ותמשיכו בחיים בלי ג׳וקים.',
 
-  'landing.preview.title': 'ראו את זה בפעולה',
-  'landing.preview.desc': 'צ׳אט בזמן אמת, התראות מיידיות, ותיאום חלק — הכל מהטלפון.',
-  'landing.preview.browse': 'עיון בהתראות',
+  'landing.preview.title': 'איך זה נראה',
+  'landing.preview.desc': 'צ׳אט בזמן אמת, התראות מיידיות, וסנכרון קל — הכל מהטלפון.',
+  'landing.preview.browse': 'צפייה בהתראות',
   'landing.preview.chat': 'צ׳אט בזמן אמת',
-  'landing.preview.dashboard': 'לוח הבקרה שלך',
+  'landing.preview.dashboard': 'הדשבורד שלך',
 
   'landing.twoSides.title': 'שני צדדים, פלטפורמה אחת',
-  'landing.twoSides.bugaphobes': 'ג׳וקופובים',
-  'landing.twoSides.bugaphobes.desc': 'מפחדים מג׳וקים? אתם לא לבד. פרסמו התראה וג׳וק-קוטל יגיע להציל את המצב — בלי שיפוטיות, רק הקלה.',
-  'landing.twoSides.bugaphobes.1': 'פרסום התראות בשניות',
-  'landing.twoSides.bugaphobes.2': 'צ׳אט בזמן אמת עם הג׳וק-קוטל',
-  'landing.twoSides.bugaphobes.3': 'חינם לחלוטין',
-  'landing.twoSides.roasters': 'ג׳וק-קוטלים',
-  'landing.twoSides.roasters.desc': 'לא מפחדים מכמה ג׳וקים? היו גיבורים למי שצריך. קבלו התראות, סלקו ג׳וקים, וקבלו טיפים מג׳וקופובים אסירי תודה.',
-  'landing.twoSides.roasters.1': 'עזרו לאנשים והיו גיבורים',
-  'landing.twoSides.roasters.2': 'קבלו טיפים "קנו לי קפה"',
+  'landing.twoSides.bugaphobes': 'מפחדים מג׳וקים?',
+  'landing.twoSides.bugaphobes.desc': 'אתם לא לבד. שלחו התראה ומישהו אמיץ יגיע לטפל בזה — בלי שיפוטיות, רק הקלה.',
+  'landing.twoSides.bugaphobes.1': 'שליחת התראה תוך שניות',
+  'landing.twoSides.bugaphobes.2': 'צ׳אט ישיר עם הרוסטר',
+  'landing.twoSides.bugaphobes.3': 'חינם לגמרי',
+  'landing.twoSides.roasters': 'לא מפחדים מג׳וקים?',
+  'landing.twoSides.roasters.desc': 'בואו להיות גיבורים. קבלו התראות, סלקו ג׳וקים, וקבלו טיפים ממי שעזרתם להם.',
+  'landing.twoSides.roasters.1': 'תעזרו לאנשים ותהיו גיבורים',
+  'landing.twoSides.roasters.2': 'קבלו טיפים מאסירי תודה',
   'landing.twoSides.roasters.3': 'טפסו בטבלת המובילים',
 
-  'landing.stats.available': 'זמין',
+  'landing.stats.available': 'זמינות',
   'landing.stats.response': 'זמן תגובה',
-  'landing.stats.verified': 'ג׳וק-קוטלים מאומתים',
-  'landing.stats.fees': 'ללא עמלות נסתרות',
+  'landing.stats.verified': 'רוסטרים מאומתים',
+  'landing.stats.fees': 'בלי עמלות נסתרות',
 
-  'landing.cta.title': 'מוכנים לחיים ללא ג׳וקים?',
-  'landing.cta.desc': 'הצטרפו לג׳וק-קוטל היום — זה לגמרי בחינם. בין אם אתם צריכים עזרה או רוצים להיות הגיבורים.',
-  'landing.cta.button': 'הירשמו עכשיו — זה חינם',
+  'landing.cta.title': 'מוכנים לחיים בלי ג׳וקים?',
+  'landing.cta.desc': 'הצטרפו לרואצ׳ רוסטרס — זה בחינם לגמרי. בין אם צריכים עזרה או רוצים להיות הגיבורים.',
+  'landing.cta.button': 'הרשמה בחינם',
 
-  'landing.support.title': 'אהבתם את השירות?',
-  'landing.support.desc': 'ג׳וק-קוטל חינמי לכולם. אם אתם נהנים מהפלטפורמה, קנו לי קפה כדי שאוכל להמשיך להרחיב אותה!',
+  'landing.support.title': 'נהניתם מהשירות?',
+  'landing.support.desc': 'רואצ׳ רוסטרס חינמי לגמרי. אם אהבתם, קנו לי קפה כדי שאמשיך לפתח את הפלטפורמה!',
   'landing.support.button': 'קנו לי קפה',
 
   'landing.footer.terms': 'תנאי שימוש',
 
   // Home page
   'home.welcome': 'היי,',
-  'home.bugaphobe': 'ג׳וקופוב/ית',
-  'home.roaster': 'ג׳וק-קוטל',
+  'home.bugaphobe': 'מפחד/ת מג׳וקים',
+  'home.roaster': 'רוסטר',
   'home.bravery': 'אומץ',
   'home.reviews': 'ביקורות',
   'home.rating': 'דירוג',
-  'home.postAlert': 'פרסם התראת ג׳וק',
+  'home.postAlert': 'שלח התראת ג׳וק',
   'home.myAlerts': 'ההתראות שלי',
-  'home.nearbyAlerts': 'התראות בסביבה',
+  'home.nearbyAlerts': 'התראות קרובות',
   'home.noAlerts': 'אין התראות עדיין',
   'home.responses': 'תגובות',
 
   // Browse
-  'browse.roasters': 'מצא ג׳וק-קוטל',
-  'browse.alerts': 'התראות בסביבה',
+  'browse.roasters': 'חפש רוסטר',
+  'browse.alerts': 'התראות קרובות',
 
   // Activity
   'activity.title': 'פעילות',
@@ -217,8 +217,8 @@ const he: Translations = {
   'activity.noJobs': 'אין משימות עדיין',
 
   // Chat
-  'chat.typeMessage': 'כתוב הודעה...',
-  'chat.tipRoaster': 'קנה קפה ל',
+  'chat.typeMessage': 'כתבו הודעה...',
+  'chat.tipRoaster': 'קנו קפה ל',
   'chat.jobCompleted': 'המשימה הושלמה',
 
   // Profile
@@ -234,9 +234,9 @@ const he: Translations = {
 
   // Role select
   'role.title': 'בחרו צד',
-  'role.subtitle': 'בחרו תפקיד כדי להתחיל',
-  'role.bugaphobe': 'אני מפחד/ת מג׳וקים וצריך/ה מישהו אמיץ שיטפל בהם!',
-  'role.roaster': 'ג׳וקים לא מפחידים אותי! אני אעזור לאחרים ואהיה גיבור.',
+  'role.subtitle': 'מה מתאים לכם?',
+  'role.bugaphobe': 'אני מפחד/ת מג׳וקים וצריך/ה מישהו שיבוא לטפל בהם!',
+  'role.roaster': 'ג׳וקים לא מפחידים אותי! אשמח לעזור לאחרים.',
   'role.continue': 'המשך',
 
   // Common

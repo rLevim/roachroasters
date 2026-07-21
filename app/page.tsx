@@ -168,12 +168,18 @@ export default function LandingPage() {
           <span className="text-lg sm:text-xl font-black tracking-wide">RoachRoasters</span>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
-          <button
-            onClick={() => setLang(lang === 'en' ? 'he' : 'en')}
-            className="px-2 py-1.5 rounded-xl text-sm font-bold hover:bg-white/10 transition-colors cursor-pointer"
-          >
-            {lang === 'en' ? 'עברית' : 'English'}
-          </button>
+          <div className="relative">
+            <button
+              onClick={() => setLang(lang === 'en' ? 'he' : 'en')}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-sm font-bold hover:bg-white/10 transition-colors cursor-pointer"
+              title={lang === 'en' ? 'Switch to Hebrew' : 'החלף לאנגלית'}
+            >
+              <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 003 12c0-1.605.42-3.113 1.157-4.418" />
+              </svg>
+              <span className="text-xs">{lang === 'en' ? 'עב' : 'EN'}</span>
+            </button>
+          </div>
           <Link
             href="/login"
             className="px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm font-bold hover:bg-white/10 transition-colors"
@@ -216,8 +222,8 @@ export default function LandingPage() {
             </div>
             <p className="text-sm text-purple-light/70 mt-4">{t('landing.hero.free')}</p>
           </div>
-          <div className="hidden md:block relative">
-            <img src="/images/bugaphobe-hero.png" alt="Scared of a cockroach" className="w-full max-w-md mx-auto rounded-3xl shadow-2xl" />
+          <div className="relative">
+            <img src="/images/bugaphobe-hero.png" alt="Scared of a cockroach" className="w-full max-w-xs sm:max-w-md mx-auto rounded-3xl shadow-2xl" />
           </div>
         </div>
       </section>
@@ -323,8 +329,8 @@ export default function LandingPage() {
           </h2>
           <div className="grid md:grid-cols-2 gap-4 sm:gap-8">
             <div className="bg-gradient-to-br from-purple-mid/30 to-purple-dark/30 rounded-2xl overflow-hidden border border-white/10">
-              <div className="h-32 sm:h-56 overflow-hidden">
-                <img src="/images/bugaphobe-hero.png" alt="Bugaphobe" className="w-full h-full object-cover" />
+              <div className="h-48 sm:h-64 overflow-hidden">
+                <img src="/images/bugaphobe-hero.png" alt="Bugaphobe" className="w-full h-full object-cover object-top" />
               </div>
               <div className="p-5 sm:p-8">
                 <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">{t('landing.twoSides.bugaphobes')}</h3>
@@ -348,8 +354,8 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="bg-gradient-to-br from-coral/20 to-coral-dark/20 rounded-2xl overflow-hidden border border-white/10">
-              <div className="h-32 sm:h-56 overflow-hidden">
-                <img src="/images/roaster-hero.png" alt="Roach Roaster" className="w-full h-full object-cover" />
+              <div className="h-48 sm:h-64 overflow-hidden">
+                <img src="/images/roaster-hero.png" alt="Roach Roaster" className="w-full h-full object-cover object-top" />
               </div>
               <div className="p-5 sm:p-8">
                 <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">{t('landing.twoSides.roasters')}</h3>
