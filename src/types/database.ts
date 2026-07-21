@@ -34,6 +34,9 @@ export interface Profile {
   bravery_score: number;
   terms_accepted_at: string | null;
   onboarding_completed: boolean;
+  latitude: number | null;
+  longitude: number | null;
+  notification_radius_km: number;
   is_suspended: boolean;
   is_banned: boolean;
   created_at: string;

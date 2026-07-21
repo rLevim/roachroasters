@@ -172,11 +172,18 @@ function BrowseAlerts() {
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => setMyLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          setMyLocation({ lat, lng });
+          if (userId) {
+            supabase.from('profiles').update({ latitude: lat, longitude: lng }).eq('id', userId).then(() => {});
+          }
+        },
         () => {}
       );
     }
-  }, []);
+  }, [userId]);
 
   const handleRespond = async (alertId: string) => {
     setRespondingId(alertId);

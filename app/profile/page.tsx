@@ -23,6 +23,7 @@ export default function ProfilePage() {
   const [bio, setBio] = useState('');
   const [city, setCity] = useState('');
   const [paypalMe, setPaypalMe] = useState('');
+  const [notificationRadius, setNotificationRadius] = useState(10);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -39,6 +40,7 @@ export default function ProfilePage() {
       setBio(profile.bio || '');
       setCity(profile.city || '');
       setPaypalMe(profile.paypal_me || '');
+      setNotificationRadius(profile.notification_radius_km ?? 10);
       setPhotoUrl(profile.photo_url);
     }
   }, [profile]);
@@ -130,6 +132,7 @@ export default function ProfilePage() {
       };
       if (isRoaster) {
         updates.paypal_me = paypalMe.trim() || null;
+        updates.notification_radius_km = notificationRadius;
       }
       await updateProfile(updates);
       setEditing(false);
@@ -377,6 +380,29 @@ export default function ProfilePage() {
               </div>
             )}
 
+            {isRoaster && (
+              <div>
+                <label className="block text-sm font-semibold text-gray-600 mb-1">
+                  Notification Radius — {notificationRadius} km
+                </label>
+                <input
+                  type="range"
+                  min={1}
+                  max={50}
+                  value={notificationRadius}
+                  onChange={(e) => setNotificationRadius(Number(e.target.value))}
+                  className="w-full accent-purple-mid"
+                />
+                <div className="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>1 km</span>
+                  <span>50 km</span>
+                </div>
+                <p className="text-xs text-gray-400 mt-1">
+                  Get notified about roach alerts within this distance.
+                </p>
+              </div>
+            )}
+
             <div className="flex gap-3">
               <Button
                 title="Save"
@@ -394,6 +420,7 @@ export default function ProfilePage() {
                     setBio(profile.bio || '');
                     setCity(profile.city || '');
                     setPaypalMe(profile.paypal_me || '');
+                    setNotificationRadius(profile.notification_radius_km ?? 10);
                   }
                 }}
                 variant="ghost"

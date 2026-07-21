@@ -59,6 +59,18 @@ export default function HomePage() {
     fetchMyJobs();
     if (isRoaster) fetchNearbyAlerts();
     if (isBugaphobe) fetchMyAlerts();
+
+    if (userId && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          supabase.from('profiles').update({
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+          }).eq('id', userId).then(() => {});
+        },
+        () => {}
+      );
+    }
   }, [isRoaster, isBugaphobe, userId]);
 
   // Real-time: listen for new alerts and new jobs
