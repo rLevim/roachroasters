@@ -188,8 +188,8 @@ const he: Translations = {
   'landing.cta.button': 'הרשמה בחינם',
 
   'landing.support.title': 'נהניתם מהשירות?',
-  'landing.support.desc': 'RoachRoasters חינמי לגמרי. אם אהבתם, קנו לי קפה כדי שאמשיך לפתח את הפלטפורמה!',
-  'landing.support.button': 'קנו לי קפה',
+  'landing.support.desc': 'RoachRoasters חינמי לגמרי. אם אהבתם, הזמינו אותי לקפה כדי שאמשיך לפתח את הפלטפורמה!',
+  'landing.support.button': 'הזמינו אותי לקפה',
 
   'landing.footer.terms': 'תנאי שימוש',
 
