@@ -50,7 +50,19 @@ export async function POST(req: NextRequest) {
   try {
     const authHeader = req.headers.get('authorization');
     const expectedToken = process.env.WEBHOOK_SECRET || supabaseServiceKey;
-    if (authHeader !== `Bearer ${expectedToken}`) {
+
+    let authorized = false;
+    if (authHeader === `Bearer ${expectedToken}`) {
+      authorized = true;
+    } else if (authHeader?.startsWith('Bearer ')) {
+      const userClient = createClient(supabaseUrl, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: { user } } = await userClient.auth.getUser();
+      if (user) authorized = true;
+    }
+
+    if (!authorized) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -84,7 +96,7 @@ export async function POST(req: NextRequest) {
       const { data: sender } = await supabase
         .from('profiles')
         .select('display_name')
-        .eq('id', sender_id)
+        .eq('user_id', sender_id)
         .single();
 
       const senderName = sender?.display_name || 'Someone';
@@ -103,9 +115,9 @@ export async function POST(req: NextRequest) {
 
       const { data: roasters } = await supabase
         .from('profiles')
-        .select('id, latitude, longitude, notification_radius_km')
+        .select('user_id, latitude, longitude, notification_radius_km')
         .eq('role', 'roach_roaster')
-        .neq('id', bugaphobe_id)
+        .neq('user_id', bugaphobe_id)
         .not('latitude', 'is', null)
         .not('longitude', 'is', null);
 
@@ -116,7 +128,7 @@ export async function POST(req: NextRequest) {
             const dist = haversineKm(latitude, longitude, r.latitude!, r.longitude!);
             return dist <= radius;
           })
-          .map((r) => r.id);
+          .map((r) => r.user_id);
 
         if (nearbyIds.length > 0) {
           const desc = description || 'A cockroach needs handling!';
@@ -145,7 +157,7 @@ export async function POST(req: NextRequest) {
         const { data: roaster } = await supabase
           .from('profiles')
           .select('display_name')
-          .eq('id', roaster_id)
+          .eq('user_id', roaster_id)
           .single();
 
         const roasterName = roaster?.display_name || 'A Roach Roaster';

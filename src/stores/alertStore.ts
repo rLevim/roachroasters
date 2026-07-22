@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
+import { triggerPushNotification } from '@/lib/notify';
 import type { RoachAlert, AlertResponse, Profile } from '@/types/database';
 
 interface AlertWithProfile extends RoachAlert {
@@ -89,6 +90,10 @@ export const useAlertStore = create<AlertState>((set) => ({
       .select()
       .single();
 
+    if (data) {
+      triggerPushNotification('roach_alerts', data);
+    }
+
     return data as RoachAlert | null;
   },
 
@@ -96,16 +101,20 @@ export const useAlertStore = create<AlertState>((set) => ({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('alert_responses')
       .insert({
         alert_id: alertId,
         roaster_id: user.id,
         message,
-      });
+      })
+      .select()
+      .single();
 
     if (error) {
       console.error('Failed to respond to alert:', error.message);
+    } else if (data) {
+      triggerPushNotification('alert_responses', data);
     }
   },
 

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
+import { triggerPushNotification } from '@/lib/notify';
 import { getLevelForXp } from '@/constants/badges';
 import type { Job, Message } from '@/types/database';
 
@@ -216,13 +217,17 @@ export const useJobStore = create<JobState>((set, get) => ({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    await supabase.from('messages').insert({
+    const { data: msg } = await supabase.from('messages').insert({
       job_id: jobId,
       sender_id: user.id,
       content,
       message_type: type,
       metadata: metadata || null,
-    });
+    }).select().single();
+
+    if (msg && type !== 'system') {
+      triggerPushNotification('messages', msg);
+    }
   },
 
   fetchMessages: async (jobId) => {

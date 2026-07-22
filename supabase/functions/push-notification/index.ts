@@ -94,7 +94,7 @@ Deno.serve(async (req) => {
       const { data: sender } = await supabase
         .from("profiles")
         .select("display_name")
-        .eq("id", sender_id)
+        .eq("user_id", sender_id)
         .single();
 
       const senderName = sender?.display_name || "Someone";
@@ -114,9 +114,9 @@ Deno.serve(async (req) => {
 
       const { data: roasters } = await supabase
         .from("profiles")
-        .select("id, latitude, longitude, notification_radius_km")
+        .select("user_id, latitude, longitude, notification_radius_km")
         .eq("role", "roach_roaster")
-        .neq("id", bugaphobe_id)
+        .neq("user_id", bugaphobe_id)
         .not("latitude", "is", null)
         .not("longitude", "is", null);
 
@@ -127,7 +127,7 @@ Deno.serve(async (req) => {
             const dist = haversineKm(latitude, longitude, r.latitude, r.longitude);
             return dist <= radius;
           })
-          .map((r: { id: string }) => r.id);
+          .map((r: { user_id: string }) => r.user_id);
 
         if (nearbyIds.length > 0) {
           const desc = description || "A cockroach needs handling!";
@@ -158,7 +158,7 @@ Deno.serve(async (req) => {
         const { data: roaster } = await supabase
           .from("profiles")
           .select("display_name")
-          .eq("id", roaster_id)
+          .eq("user_id", roaster_id)
           .single();
 
         const roasterName = roaster?.display_name || "A Roach Roaster";
