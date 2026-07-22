@@ -11,8 +11,34 @@ const ADMIN_EMAIL = 'rotem.levim@gmail.com';
 
 type Tab = 'overview' | 'users' | 'alerts' | 'jobs' | 'support';
 
+async function getToken() {
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.access_token;
+}
+
+async function adminGet(resource: string) {
+  const token = await getToken();
+  if (!token) throw new Error('Not authenticated');
+  const res = await fetch(`/api/admin?resource=${resource}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`API error: ${res.status}`);
+  return res.json();
+}
+
+async function adminPost(action: string, data: Record<string, string>) {
+  const token = await getToken();
+  if (!token) throw new Error('Not authenticated');
+  const res = await fetch('/api/admin', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ action, ...data }),
+  });
+  if (!res.ok) throw new Error(`API error: ${res.status}`);
+  return res.json();
+}
+
 export default function AdminPage() {
-  const userId = useAuthStore((s) => s.user?.id);
   const userEmail = useAuthStore((s) => s.user?.email);
   const initialized = useAuthStore((s) => s.initialized);
   const addToast = useToastStore((s) => s.addToast);
@@ -39,138 +65,86 @@ export default function AdminPage() {
   const fetchAll = async () => {
     setLoading(true);
     try {
-      await Promise.all([fetchStats(), fetchUsers(), fetchAlerts(), fetchJobs(), fetchTickets()]);
+      const [statsData, usersData, alertsData, jobsData, ticketsData] = await Promise.all([
+        adminGet('stats'),
+        adminGet('profiles'),
+        adminGet('alerts'),
+        adminGet('jobs'),
+        adminGet('support'),
+      ]);
+      setStats(statsData);
+      setUsers(usersData);
+      setAlerts(alertsData);
+      setJobs(jobsData);
+      setTickets(ticketsData);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchStats = async () => {
-    const [{ count: totalUsers }, { count: totalJobs }, { count: activeJobs }, { count: completedJobs }, { data: completedJobData }, { count: openTickets }] = await Promise.all([
-      supabase.from('profiles').select('*', { count: 'exact', head: true }),
-      supabase.from('jobs').select('*', { count: 'exact', head: true }),
-      supabase.from('jobs').select('*', { count: 'exact', head: true }).in('status', ['pending', 'accepted', 'in_progress']),
-      supabase.from('jobs').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
-      supabase.from('jobs').select('price, platform_fee').eq('status', 'completed'),
-      supabase.from('support_messages').select('*', { count: 'exact', head: true }).eq('status', 'open'),
-    ]);
-    const totalRevenue = completedJobData?.reduce((sum: number, j: { platform_fee: number }) => sum + (j.platform_fee || 0), 0) || 0;
-    setStats({
-      totalUsers: totalUsers || 0,
-      totalJobs: totalJobs || 0,
-      activeJobs: activeJobs || 0,
-      completedJobs: completedJobs || 0,
-      totalRevenue,
-      openTickets: openTickets || 0,
-    });
-  };
-
-  const fetchAlerts = async () => {
-    const { data } = await supabase
-      .from('roach_alerts')
-      .select('*, profiles!roach_alerts_bugaphobe_id_fkey(display_name)')
-      .order('created_at', { ascending: false });
-    if (data) setAlerts(data as any[]);
-  };
-
-  const handleCancelAlert = async (alertId: string) => {
-    if (!window.confirm('Cancel this alert?')) return;
-    await supabase.from('roach_alerts').update({ status: 'cancelled' }).eq('id', alertId);
-    addToast('Alert cancelled', 'success');
-    fetchAlerts();
-    fetchStats();
-  };
-
-  const fetchUsers = async () => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (data) setUsers(data as Profile[]);
-  };
-
-  const fetchJobs = async () => {
-    const { data } = await supabase
-      .from('jobs')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(100);
-    if (data) setJobs(data as Job[]);
-  };
-
-  const fetchTickets = async () => {
-    const { data } = await supabase
-      .from('support_messages')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (data && data.length > 0) {
-      const userIds = [...new Set(data.map((t: SupportMessage) => t.user_id))];
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('user_id, display_name, photo_url')
-        .in('user_id', userIds);
-      const profileMap: Record<string, { display_name: string; photo_url: string | null }> = {};
-      if (profiles) {
-        for (const p of profiles) profileMap[p.user_id] = { display_name: p.display_name, photo_url: p.photo_url };
-      }
-      setTickets(data.map((t: SupportMessage) => ({ ...t, profiles: profileMap[t.user_id] })));
-    } else {
-      setTickets([]);
     }
   };
 
   const handleBanUser = async (targetUserId: string, ban: boolean) => {
     const action = ban ? 'ban' : 'unban';
     if (!window.confirm(`Are you sure you want to ${action} this user?`)) return;
-    await supabase.from('profiles').update({ is_banned: ban }).eq('user_id', targetUserId);
+    await adminPost(action, { userId: targetUserId });
     addToast(`User ${ban ? 'banned' : 'unbanned'}`, 'success');
-    fetchUsers();
+    const data = await adminGet('profiles');
+    setUsers(data);
   };
 
   const handleSuspendUser = async (targetUserId: string, suspend: boolean) => {
-    await supabase.from('profiles').update({ is_suspended: suspend }).eq('user_id', targetUserId);
+    await adminPost(suspend ? 'suspend' : 'unsuspend', { userId: targetUserId });
     addToast(`User ${suspend ? 'suspended' : 'unsuspended'}`, 'success');
-    fetchUsers();
+    const data = await adminGet('profiles');
+    setUsers(data);
   };
 
   const handleVerifyUser = async (targetUserId: string, verify: boolean) => {
-    await supabase.from('profiles').update({ is_verified: verify }).eq('user_id', targetUserId);
+    await adminPost(verify ? 'verify' : 'unverify', { userId: targetUserId });
     addToast(`User ${verify ? 'verified' : 'unverified'}`, 'success');
-    fetchUsers();
+    const data = await adminGet('profiles');
+    setUsers(data);
   };
 
   const handleDeleteUser = async (targetUserId: string) => {
     if (!window.confirm('Are you sure you want to DELETE this user? This cannot be undone.')) return;
     if (!window.confirm('Really delete? All their data will be lost.')) return;
-    await supabase.from('profiles').delete().eq('user_id', targetUserId);
+    await adminPost('delete_user', { userId: targetUserId });
     addToast('User deleted', 'success');
-    fetchUsers();
+    const data = await adminGet('profiles');
+    setUsers(data);
+  };
+
+  const handleCancelAlert = async (alertId: string) => {
+    if (!window.confirm('Cancel this alert?')) return;
+    await adminPost('cancel_alert', { alertId });
+    addToast('Alert cancelled', 'success');
+    const [alertsData, statsData] = await Promise.all([adminGet('alerts'), adminGet('stats')]);
+    setAlerts(alertsData);
+    setStats(statsData);
   };
 
   const handleReplyTicket = async (ticketId: string) => {
     if (!replyText.trim()) return;
     setSendingReply(true);
     try {
-      await supabase.from('support_messages').update({
-        admin_reply: replyText.trim(),
-        status: 'resolved',
-        updated_at: new Date().toISOString(),
-      }).eq('id', ticketId);
+      await adminPost('reply_ticket', { ticketId, reply: replyText.trim() });
       addToast('Reply sent', 'success');
       setReplyingTo(null);
       setReplyText('');
-      fetchTickets();
-      fetchStats();
+      const [ticketsData, statsData] = await Promise.all([adminGet('support'), adminGet('stats')]);
+      setTickets(ticketsData);
+      setStats(statsData);
     } finally {
       setSendingReply(false);
     }
   };
 
   const handleTicketStatus = async (ticketId: string, status: 'open' | 'in_progress' | 'resolved') => {
-    await supabase.from('support_messages').update({ status, updated_at: new Date().toISOString() }).eq('id', ticketId);
+    await adminPost('ticket_status', { ticketId, status });
     addToast('Status updated', 'success');
-    fetchTickets();
-    fetchStats();
+    const [ticketsData, statsData] = await Promise.all([adminGet('support'), adminGet('stats')]);
+    setTickets(ticketsData);
+    setStats(statsData);
   };
 
   if (!initialized) {
