@@ -144,9 +144,9 @@ const he: Translations = {
   // Landing page
   'landing.login': 'התחברות',
   'landing.signup': 'הרשמה',
-  'landing.hero.title1': 'יש לך ג׳וק?',
-  'landing.hero.title2': 'יש לנו פתרון.',
-  'landing.hero.desc': 'רואצ׳ רוסטרס מחבר בין אנשים שגילו ג׳וק לגיבורים שמוכנים לבוא ולסלק אותו — מהר, בחינם, ובלחיצת כפתור.',
+  'landing.hero.title1': 'יש לך ג׳וק',
+  'landing.hero.title2': 'יש לנו פתרון',
+  'landing.hero.desc': 'RoachRoasters מחברת בין אנשים שמפחדים מג׳וקים לבין אנשים בקרבת המקום שיכולים לבוא להציל אותם ולסלק את הג׳וקים - בחינם, במהירות ובלחיצת כפתור.',
   'landing.hero.cta': 'בואו נתחיל',
   'landing.hero.howItWorks': 'איך זה עובד',
   'landing.hero.free': '100% בחינם. בלי עמלות, בלי מנויים.',
@@ -184,11 +184,11 @@ const he: Translations = {
   'landing.stats.fees': 'בלי עמלות נסתרות',
 
   'landing.cta.title': 'מוכנים לחיים בלי ג׳וקים?',
-  'landing.cta.desc': 'הצטרפו לרואצ׳ רוסטרס — זה בחינם לגמרי. בין אם צריכים עזרה או רוצים להיות הגיבורים.',
+  'landing.cta.desc': 'הצטרפו ל-RoachRoasters — זה בחינם לגמרי. בין אם צריכים עזרה או רוצים להיות הגיבורים.',
   'landing.cta.button': 'הרשמה בחינם',
 
   'landing.support.title': 'נהניתם מהשירות?',
-  'landing.support.desc': 'רואצ׳ רוסטרס חינמי לגמרי. אם אהבתם, קנו לי קפה כדי שאמשיך לפתח את הפלטפורמה!',
+  'landing.support.desc': 'RoachRoasters חינמי לגמרי. אם אהבתם, קנו לי קפה כדי שאמשיך לפתח את הפלטפורמה!',
   'landing.support.button': 'קנו לי קפה',
 
   'landing.footer.terms': 'תנאי שימוש',

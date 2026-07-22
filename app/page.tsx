@@ -198,12 +198,12 @@ export default function LandingPage() {
       {/* Hero */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-14 sm:pb-20">
         <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-          <div className="text-center md:text-left">
+          <div className="text-center md:text-start">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black leading-tight mb-4 sm:mb-6">
               {t('landing.hero.title1')}<br />
               <span className="text-coral">{t('landing.hero.title2')}</span>
             </h1>
-            <p className="text-base sm:text-lg md:text-xl text-purple-light max-w-lg mx-auto md:mx-0 mb-8 sm:mb-10 leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-purple-light max-w-lg mx-auto md:ms-0 md:me-auto mb-8 sm:mb-10 leading-relaxed">
               {t('landing.hero.desc')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center md:justify-start">
