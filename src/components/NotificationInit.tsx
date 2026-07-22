@@ -19,8 +19,13 @@ export function NotificationInit() {
       OneSignal.init({
         appId,
         allowLocalhostAsSecureOrigin: true,
-      }).then(() => {
-        OneSignal.login(user.id);
+        notifyButton: { enable: false },
+      }).then(async () => {
+        await OneSignal.login(user.id);
+        const permission = OneSignal.Notifications.permission;
+        if (!permission) {
+          OneSignal.Notifications.requestPermission();
+        }
       });
     });
   }, [user, profile]);
