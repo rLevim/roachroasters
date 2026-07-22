@@ -1,5 +1,13 @@
 import type { Metadata, Viewport } from 'next';
+import { Assistant } from 'next/font/google';
 import './globals.css';
+
+const assistant = Assistant({
+  subsets: ['hebrew', 'latin'],
+  weight: ['400', '600', '700', '800'],
+  variable: '--font-assistant',
+  display: 'swap',
+});
 import { AuthInitializer } from '@/components/AuthInitializer';
 import { NotificationInit } from '@/components/NotificationInit';
 import { ToastContainer } from '@/components/Toast';
@@ -28,7 +36,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={assistant.variable}>
       <body className="bg-lavender min-h-screen font-sans antialiased">
         <ClientProviders>
           <AuthInitializer />
