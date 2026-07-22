@@ -297,8 +297,13 @@ export default function AdminPage() {
                         </p>
                         <p className="text-xs text-gray-400">
                           {u.rating.toFixed(1)} rating · {u.total_reviews} reviews
-                          {u.role === 'roach_roaster' && ` · ${u.roaches_killed} killed · $${u.price || 0}`}
+                          {u.role === 'roach_roaster' && ` · ${u.roaches_killed} killed · ${u.notification_radius_km}km radius`}
                         </p>
+                        {(u as any).email && (
+                          <p className="text-xs text-gray-400">
+                            <a href={`mailto:${(u as any).email}`} className="text-purple-mid hover:underline">{(u as any).email}</a>
+                          </p>
+                        )}
                       </div>
                     </div>
                     <div className="flex gap-2 flex-wrap">
@@ -391,6 +396,7 @@ export default function AdminPage() {
               <div className="space-y-3">
                 <p className="text-sm text-gray-500">{jobs.length} jobs (latest 100)</p>
                 {jobs.map((j) => {
+                  const jAny = j as any;
                   const statusStyle: Record<string, string> = {
                     pending: 'bg-yellow-100 text-yellow-700',
                     accepted: 'bg-blue-100 text-blue-700',
@@ -400,18 +406,36 @@ export default function AdminPage() {
                     disputed: 'bg-red-100 text-red-700',
                   };
                   return (
-                    <div key={j.id} className="bg-white rounded-2xl p-4">
+                    <div key={j.id} className="bg-white rounded-2xl p-4 space-y-2">
                       <div className="flex items-center gap-3">
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-purple-ink text-sm">Job #{j.id.slice(0, 8)}</p>
-                          <p className="text-xs text-gray-400">
-                            ${j.price} + ${j.platform_fee} fee · {new Date(j.created_at).toLocaleDateString()}
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="font-semibold text-purple-ink text-sm">Job #{j.id.slice(0, 8)}</p>
+                            <span className={`text-xs font-bold px-3 py-1 rounded-full ${statusStyle[j.status] || 'bg-gray-100 text-gray-500'}`}>
+                              {j.status}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {new Date(j.created_at).toLocaleString()}
+                            {j.completed_at && ` · Completed ${new Date(j.completed_at).toLocaleString()}`}
                           </p>
                         </div>
-                        <span className={`text-xs font-bold px-3 py-1 rounded-full ${statusStyle[j.status] || 'bg-gray-100 text-gray-500'}`}>
-                          {j.status}
-                        </span>
                       </div>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="bg-purple-light/20 rounded-lg p-2">
+                          <p className="text-gray-500">Bugaphobe</p>
+                          <p className="font-semibold text-purple-ink">{jAny.bugaphobe_name || j.bugaphobe_id.slice(0, 8)}</p>
+                        </div>
+                        <div className="bg-coral-light/40 rounded-lg p-2">
+                          <p className="text-gray-500">Roaster</p>
+                          <p className="font-semibold text-purple-ink">{jAny.roaster_name || j.roaster_id.slice(0, 8)}</p>
+                        </div>
+                      </div>
+                      {jAny.alert_description && (
+                        <p className="text-sm text-gray-600 bg-gray-50 rounded-lg p-2">
+                          {jAny.alert_description}
+                        </p>
+                      )}
                     </div>
                   );
                 })}

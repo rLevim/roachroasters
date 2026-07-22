@@ -53,6 +53,12 @@ export async function GET(req: NextRequest) {
   if (resource === 'profiles') {
     const { data, error } = await db.from('profiles').select('*').order('created_at', { ascending: false });
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (data && data.length > 0) {
+      const { data: { users: authUsers } } = await db.auth.admin.listUsers({ perPage: 1000 });
+      const emailMap: Record<string, string> = {};
+      if (authUsers) for (const u of authUsers) emailMap[u.id] = u.email || '';
+      return NextResponse.json(data.map((p: any) => ({ ...p, email: emailMap[p.user_id] || '' })));
+    }
     return NextResponse.json(data);
   }
 
@@ -68,6 +74,26 @@ export async function GET(req: NextRequest) {
   if (resource === 'jobs') {
     const { data, error } = await db.from('jobs').select('*').order('created_at', { ascending: false }).limit(100);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (data && data.length > 0) {
+      const allIds = [...new Set(data.flatMap((j: any) => [j.bugaphobe_id, j.roaster_id]))];
+      const alertIds = [...new Set(data.map((j: any) => j.alert_id).filter(Boolean))];
+      const [{ data: profiles }, { data: alertsData }] = await Promise.all([
+        db.from('profiles').select('user_id, display_name').in('user_id', allIds),
+        alertIds.length > 0
+          ? db.from('roach_alerts').select('id, description').in('id', alertIds)
+          : Promise.resolve({ data: [] }),
+      ]);
+      const nameMap: Record<string, string> = {};
+      if (profiles) for (const p of profiles) nameMap[p.user_id] = p.display_name;
+      const alertMap: Record<string, string> = {};
+      if (alertsData) for (const a of alertsData as any[]) alertMap[a.id] = a.description || '';
+      return NextResponse.json(data.map((j: any) => ({
+        ...j,
+        bugaphobe_name: nameMap[j.bugaphobe_id] || 'Unknown',
+        roaster_name: nameMap[j.roaster_id] || 'Unknown',
+        alert_description: j.alert_id ? (alertMap[j.alert_id] || 'No description') : null,
+      })));
+    }
     return NextResponse.json(data);
   }
 
