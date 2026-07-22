@@ -118,6 +118,21 @@ const en: Translations = {
   'role.roaster': "Cockroaches don't scare me! I'll help others and be a hero.",
   'role.continue': 'Continue',
 
+  // Create Alert
+  'createAlert.title': 'Spotted a Roach?',
+  'createAlert.subtitle': 'Post an alert and nearby Roach Roasters will come to your rescue!',
+  'createAlert.situation': "What's the situation? (optional)",
+  'createAlert.placeholder': "e.g. There's a huge cockroach in my kitchen and I'm terrified...",
+  'createAlert.location': 'Your Location',
+  'createAlert.detecting': 'Detecting location...',
+  'createAlert.detected': 'Location detected',
+  'createAlert.noLocation': 'Location not available. Please enable location services.',
+  'createAlert.geoNotSupported': 'Geolocation is not supported by your browser.',
+  'createAlert.geoDenied': 'Location access denied. Please enable location services.',
+  'createAlert.waitLocation': 'Please wait for your location to be detected.',
+  'createAlert.failed': 'Failed to create alert. Please try again.',
+  'createAlert.button': 'Post Roach Alert',
+
   // Common
   'common.loading': 'Loading...',
   'common.error': 'Something went wrong',
@@ -238,6 +253,21 @@ const he: Translations = {
   'role.bugaphobe': 'אני מפחד/ת מג׳וקים וצריך/ה מישהו שיבוא לטפל בהם!',
   'role.roaster': 'ג׳וקים לא מפחידים אותי! אשמח לעזור לאחרים.',
   'role.continue': 'המשך',
+
+  // Create Alert
+  'createAlert.title': 'גילית ג׳וק?',
+  'createAlert.subtitle': 'שגרו התראה ורוסטרים בקרבת מקום יבואו להציל אתכם!',
+  'createAlert.situation': 'מה המצב? (לא חובה)',
+  'createAlert.placeholder': 'למשל: יש ג׳וק ענק במטבח ואני מפחד/ת...',
+  'createAlert.location': 'המיקום שלך',
+  'createAlert.detecting': 'מאתר מיקום...',
+  'createAlert.detected': 'מיקום אותר',
+  'createAlert.noLocation': 'המיקום לא זמין. אנא אפשרו שירותי מיקום.',
+  'createAlert.geoNotSupported': 'הדפדפן שלך לא תומך באיתור מיקום.',
+  'createAlert.geoDenied': 'הגישה למיקום נדחתה. אנא אפשרו שירותי מיקום.',
+  'createAlert.waitLocation': 'אנא המתינו לאיתור המיקום.',
+  'createAlert.failed': 'יצירת ההתראה נכשלה. נסו שוב.',
+  'createAlert.button': 'שגר התראה',
 
   // Common
   'common.loading': 'טוען...',

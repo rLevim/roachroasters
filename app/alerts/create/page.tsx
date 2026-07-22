@@ -5,10 +5,12 @@ import { useRouter } from 'next/navigation';
 import { useAlertStore } from '@/stores/alertStore';
 import { Button } from '@/components/Button';
 import { Navbar } from '@/components/Navbar';
+import { useI18n } from '@/lib/i18n';
 
 export default function CreateAlertPage() {
   const router = useRouter();
   const createAlert = useAlertStore((s) => s.createAlert);
+  const { t } = useI18n();
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [loading, setLoading] = useState(false);
@@ -18,7 +20,7 @@ export default function CreateAlertPage() {
   useEffect(() => {
     if (!navigator.geolocation) {
       setLocLoading(false);
-      setError('Geolocation is not supported by your browser.');
+      setError(t('createAlert.geoNotSupported'));
       return;
     }
     navigator.geolocation.getCurrentPosition(
@@ -28,14 +30,14 @@ export default function CreateAlertPage() {
       },
       () => {
         setLocLoading(false);
-        setError('Location access denied. Please enable location services.');
+        setError(t('createAlert.geoDenied'));
       }
     );
   }, []);
 
   const handleSubmit = async () => {
     if (!location) {
-      setError('Please wait for your location to be detected.');
+      setError(t('createAlert.waitLocation'));
       return;
     }
     setLoading(true);
@@ -48,7 +50,7 @@ export default function CreateAlertPage() {
       if (alert) {
         router.push(`/alerts/${alert.id}`);
       } else {
-        setError('Failed to create alert. Please try again.');
+        setError(t('createAlert.failed'));
       }
     } finally {
       setLoading(false);
@@ -62,15 +64,15 @@ export default function CreateAlertPage() {
         {/* Hero */}
         <div className="bg-purple-dark rounded-3xl p-6 text-center">
           <span className="text-6xl block mb-2"> </span>
-          <h1 className="text-2xl font-extrabold text-white">Spotted a Roach?</h1>
-          <p className="text-purple-light text-sm mt-1">Post an alert and nearby Roach Roasters will come to your rescue!</p>
+          <h1 className="text-2xl font-extrabold text-white">{t('createAlert.title')}</h1>
+          <p className="text-purple-light text-sm mt-1">{t('createAlert.subtitle')}</p>
         </div>
 
         {/* Description */}
         <div className="bg-white rounded-2xl p-4 space-y-2">
-          <label className="text-sm font-semibold text-purple-ink">What&apos;s the situation? (optional)</label>
+          <label className="text-sm font-semibold text-purple-ink">{t('createAlert.situation')}</label>
           <textarea
-            placeholder="e.g. There's a huge cockroach in my kitchen and I'm terrified..."
+            placeholder={t('createAlert.placeholder')}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
@@ -80,13 +82,13 @@ export default function CreateAlertPage() {
 
         {/* Location */}
         <div className="bg-white rounded-2xl p-4">
-          <label className="text-sm font-semibold text-purple-ink block mb-2">Your Location</label>
+          <label className="text-sm font-semibold text-purple-ink block mb-2">{t('createAlert.location')}</label>
           {locLoading ? (
-            <p className="text-sm text-gray-500">Detecting location...</p>
+            <p className="text-sm text-gray-500">{t('createAlert.detecting')}</p>
           ) : location ? (
-            <p className="text-sm text-gray-600">Location detected ({location.lat.toFixed(4)}, {location.lng.toFixed(4)})</p>
+            <p className="text-sm text-gray-600">{t('createAlert.detected')} ({location.lat.toFixed(4)}, {location.lng.toFixed(4)})</p>
           ) : (
-            <p className="text-sm text-coral-dark">Location not available. Please enable location services.</p>
+            <p className="text-sm text-coral-dark">{t('createAlert.noLocation')}</p>
           )}
         </div>
 
@@ -97,7 +99,7 @@ export default function CreateAlertPage() {
         )}
 
         <Button
-          title="Post Roach Alert"
+          title={t('createAlert.button')}
           onClick={handleSubmit}
           variant="coral"
           size="lg"
