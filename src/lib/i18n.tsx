@@ -200,7 +200,7 @@ const he: Translations = {
   'home.bravery': 'אומץ',
   'home.reviews': 'ביקורות',
   'home.rating': 'דירוג',
-  'home.postAlert': 'שלח התראת ג׳וק',
+  'home.postAlert': 'שגר התראה',
   'home.myAlerts': 'ההתראות שלי',
   'home.nearbyAlerts': 'התראות קרובות',
   'home.noAlerts': 'אין התראות עדיין',
