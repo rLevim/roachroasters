@@ -5,11 +5,11 @@ import { useAuthStore } from '@/stores/authStore';
 import { supabase } from '@/lib/supabase';
 import { Navbar } from '@/components/Navbar';
 import { useToastStore } from '@/components/Toast';
-import type { Profile, Job, SupportMessage } from '@/types/database';
+import type { Profile, Job, RoachAlert, SupportMessage } from '@/types/database';
 
 const ADMIN_EMAIL = 'rotem.levim@gmail.com';
 
-type Tab = 'overview' | 'users' | 'jobs' | 'support';
+type Tab = 'overview' | 'users' | 'alerts' | 'jobs' | 'support';
 
 export default function AdminPage() {
   const userId = useAuthStore((s) => s.user?.id);
@@ -19,6 +19,7 @@ export default function AdminPage() {
 
   const [tab, setTab] = useState<Tab>('overview');
   const [users, setUsers] = useState<Profile[]>([]);
+  const [alerts, setAlerts] = useState<(RoachAlert & { profiles?: { display_name: string } })[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [tickets, setTickets] = useState<(SupportMessage & { profiles?: { display_name: string; photo_url: string | null } })[]>([]);
   const [stats, setStats] = useState({ totalUsers: 0, totalJobs: 0, activeJobs: 0, completedJobs: 0, totalRevenue: 0, openTickets: 0 });
@@ -38,7 +39,7 @@ export default function AdminPage() {
   const fetchAll = async () => {
     setLoading(true);
     try {
-      await Promise.all([fetchStats(), fetchUsers(), fetchJobs(), fetchTickets()]);
+      await Promise.all([fetchStats(), fetchUsers(), fetchAlerts(), fetchJobs(), fetchTickets()]);
     } finally {
       setLoading(false);
     }
@@ -62,6 +63,22 @@ export default function AdminPage() {
       totalRevenue,
       openTickets: openTickets || 0,
     });
+  };
+
+  const fetchAlerts = async () => {
+    const { data } = await supabase
+      .from('roach_alerts')
+      .select('*, profiles!roach_alerts_bugaphobe_id_fkey(display_name)')
+      .order('created_at', { ascending: false });
+    if (data) setAlerts(data as any[]);
+  };
+
+  const handleCancelAlert = async (alertId: string) => {
+    if (!window.confirm('Cancel this alert?')) return;
+    await supabase.from('roach_alerts').update({ status: 'cancelled' }).eq('id', alertId);
+    addToast('Alert cancelled', 'success');
+    fetchAlerts();
+    fetchStats();
   };
 
   const fetchUsers = async () => {
@@ -205,6 +222,7 @@ export default function AdminPage() {
           {([
             ['overview', 'Overview'],
             ['users', 'Users'],
+            ['alerts', 'Alerts'],
             ['jobs', 'Jobs'],
             ['support', `Support${stats.openTickets > 0 ? ` (${stats.openTickets})` : ''}`],
           ] as [Tab, string][]).map(([key, label]) => (
@@ -343,6 +361,54 @@ export default function AdminPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* Alerts */}
+            {tab === 'alerts' && (
+              <div className="space-y-3">
+                <p className="text-sm text-gray-500">{alerts.length} alerts</p>
+                {alerts.length === 0 ? (
+                  <div className="text-center py-10">
+                    <p className="text-gray-500">No alerts yet.</p>
+                  </div>
+                ) : (
+                  alerts.map((a) => {
+                    const alertStatusStyle: Record<string, string> = {
+                      open: 'bg-green-100 text-green-700',
+                      matched: 'bg-blue-100 text-blue-700',
+                      in_progress: 'bg-yellow-100 text-yellow-700',
+                      completed: 'bg-purple-light text-purple-ink',
+                      cancelled: 'bg-gray-100 text-gray-500',
+                    };
+                    return (
+                      <div key={a.id} className="bg-white rounded-2xl p-4 space-y-2">
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="font-semibold text-purple-ink text-sm">{(a as any).profiles?.display_name || 'Unknown'}</p>
+                              <span className={`text-xs font-bold px-3 py-1 rounded-full ${alertStatusStyle[a.status] || 'bg-gray-100 text-gray-500'}`}>
+                                {a.status}
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-600 mt-1">{a.description || 'No description'}</p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              {new Date(a.created_at).toLocaleString()} · Lat: {a.latitude?.toFixed(4)}, Lng: {a.longitude?.toFixed(4)}
+                            </p>
+                          </div>
+                          {a.status === 'open' && (
+                            <button
+                              onClick={() => handleCancelAlert(a.id)}
+                              className="text-xs font-bold text-red-600 bg-red-50 px-3 py-1.5 rounded-lg hover:bg-red-100 cursor-pointer shrink-0"
+                            >
+                              Cancel
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             )}
 
