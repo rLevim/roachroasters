@@ -19,7 +19,7 @@ export function NotificationInit() {
       OneSignal.init({
         appId,
         allowLocalhostAsSecureOrigin: true,
-        notifyButton: { enable: false },
+        notifyButton: { enable: false } as any,
       }).then(async () => {
         await OneSignal.login(user.id);
         const permission = OneSignal.Notifications.permission;
