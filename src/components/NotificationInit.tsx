@@ -24,8 +24,12 @@ export function NotificationInit() {
         await OneSignal.login(user.id);
         const permission = OneSignal.Notifications.permission;
         if (!permission) {
-          OneSignal.Notifications.requestPermission();
+          // Slidedown shows an in-page prompt that doesn't require a user gesture,
+          // unlike requestPermission() which browsers silently block on page load
+          OneSignal.Slidedown.promptPush();
         }
+      }).catch((err) => {
+        console.warn('OneSignal init error:', err);
       });
     });
   }, [user, profile]);
