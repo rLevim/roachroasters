@@ -8,37 +8,29 @@ export function NotificationInit() {
   const profile = useAuthStore((s) => s.profile);
   const initialized = useRef(false);
   const [showBanner, setShowBanner] = useState(false);
-  const oneSignalRef = useRef<any>(null);
 
   useEffect(() => {
-    if (!user || !profile || initialized.current) return;
-    const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
-    if (!appId) return;
+    if (!user || !profile) return;
 
+    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+      setShowBanner(true);
+    }
+
+    if (initialized.current) return;
     initialized.current = true;
 
-    import('react-onesignal').then(({ default: OneSignal }) => {
-      oneSignalRef.current = OneSignal;
-      OneSignal.init({
-        appId,
-        allowLocalhostAsSecureOrigin: true,
-        notifyButton: { enable: false } as any,
-      }).then(async () => {
-        await OneSignal.login(user.id);
-        if (!OneSignal.Notifications.permission) {
-          setShowBanner(true);
-        }
-      }).catch((err) => {
-        console.warn('OneSignal init error:', err);
-      });
-    });
+    initOneSignal(user.id);
   }, [user, profile]);
 
   const handleAllow = async () => {
     setShowBanner(false);
-    const OneSignal = oneSignalRef.current;
-    if (OneSignal) {
-      OneSignal.Notifications.requestPermission();
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted' && user) {
+        initOneSignal(user.id);
+      }
+    } catch (err) {
+      console.warn('Notification permission error:', err);
     }
   };
 
@@ -63,4 +55,23 @@ export function NotificationInit() {
       </button>
     </div>
   );
+}
+
+function initOneSignal(userId: string) {
+  const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
+  if (!appId) return;
+
+  import('react-onesignal').then(({ default: OneSignal }) => {
+    OneSignal.init({
+      appId,
+      allowLocalhostAsSecureOrigin: true,
+      notifyButton: { enable: false } as any,
+    }).then(() => {
+      OneSignal.login(userId);
+    }).catch((err) => {
+      if (!String(err).includes('already initialized')) {
+        console.warn('OneSignal init error:', err);
+      }
+    });
+  });
 }
