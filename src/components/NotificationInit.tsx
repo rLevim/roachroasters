@@ -83,8 +83,16 @@ async function loadAndInitOneSignal(userId: string) {
           await reg.unregister();
         }
       }
+      console.log('[Notif] Testing SW registration...');
+      const testReg = await navigator.serviceWorker.register('/OneSignalSDKWorker.js', { scope: '/' });
+      console.log('[Notif] SW registered:', testReg.active?.scriptURL || testReg.installing?.scriptURL || testReg.waiting?.scriptURL || 'unknown');
+      if (testReg.installing) {
+        testReg.installing.addEventListener('statechange', (e: any) => {
+          console.log('[Notif] SW state:', e.target.state);
+        });
+      }
     } catch (e) {
-      console.warn('[Notif] SW cleanup failed:', e);
+      console.error('[Notif] SW registration FAILED:', e);
     }
   }
 
