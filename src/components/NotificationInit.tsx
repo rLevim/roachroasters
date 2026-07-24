@@ -77,14 +77,14 @@ async function loadAndInitOneSignal(userId: string) {
     try {
       const regs = await navigator.serviceWorker.getRegistrations();
       for (const reg of regs) {
-        await reg.update();
-        if (reg.waiting) {
-          console.log('[Notif] Activating waiting service worker...');
-          reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        const swUrl = reg.active?.scriptURL || '';
+        if (swUrl.includes('sw.js') && !swUrl.includes('OneSignal')) {
+          console.log('[Notif] Unregistering old SW:', swUrl);
+          await reg.unregister();
         }
       }
     } catch (e) {
-      console.warn('[Notif] SW update check failed:', e);
+      console.warn('[Notif] SW cleanup failed:', e);
     }
   }
 
@@ -94,8 +94,6 @@ async function loadAndInitOneSignal(userId: string) {
       console.log('[Notif] SDK loaded, initializing...');
       await OneSignal.init({
         appId,
-        serviceWorkerParam: { scope: '/' },
-        serviceWorkerPath: '/sw.js',
         allowLocalhostAsSecureOrigin: true,
         notifyButton: { enable: false } as any,
       });
