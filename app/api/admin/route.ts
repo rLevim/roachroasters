@@ -30,6 +30,17 @@ export async function GET(req: NextRequest) {
   const resource = searchParams.get('resource');
   const db = adminClient();
 
+  if (resource === 'health') {
+    const { count, error } = await db.from('profiles').select('*', { count: 'exact', head: true });
+    return NextResponse.json({
+      supabaseUrl: supabaseUrl ? 'set' : 'missing',
+      serviceKey: supabaseServiceKey ? `set (${supabaseServiceKey.substring(0, 10)}...)` : 'missing',
+      anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'set' : 'missing',
+      profileCount: count,
+      error: error?.message || null,
+    });
+  }
+
   if (resource === 'stats') {
     const [profiles, jobs, activeJobs, completedJobs, completedJobData, openTickets] = await Promise.all([
       db.from('profiles').select('*', { count: 'exact', head: true }),
@@ -39,6 +50,14 @@ export async function GET(req: NextRequest) {
       db.from('jobs').select('price, platform_fee').eq('status', 'completed'),
       db.from('support_messages').select('*', { count: 'exact', head: true }).eq('status', 'open'),
     ]);
+
+    if (profiles.error) {
+      console.error('[Admin] Stats query errors:', {
+        profiles: profiles.error?.message,
+        jobs: jobs.error?.message,
+      });
+    }
+
     const totalRevenue = completedJobData.data?.reduce((sum: number, j: any) => sum + (j.platform_fee || 0), 0) || 0;
     return NextResponse.json({
       totalUsers: profiles.count ?? 0,

@@ -17,19 +17,16 @@ export function NotificationInit() {
 
   useEffect(() => {
     if (!user || !profile) return;
-
-    const perm = typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'N/A';
-    console.log('[Notif] User loaded:', user.id, 'Permission:', perm);
-
-    if (perm === 'default') {
-      setShowBanner(true);
-    }
-
     if (initialized.current) return;
     initialized.current = true;
 
-    if (perm === 'granted') {
-      loadAndInitOneSignal(user.id);
+    const perm = typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'denied';
+    console.log('[Notif] User loaded:', user.id, 'Permission:', perm);
+
+    loadAndInitOneSignal(user.id);
+
+    if (perm === 'default') {
+      setShowBanner(true);
     }
   }, [user, profile]);
 
@@ -39,9 +36,6 @@ export function NotificationInit() {
       console.log('[Notif] Requesting permission...');
       const permission = await Notification.requestPermission();
       console.log('[Notif] Permission result:', permission);
-      if (permission === 'granted' && user) {
-        loadAndInitOneSignal(user.id);
-      }
     } catch (err) {
       console.warn('[Notif] Permission error:', err);
     }
@@ -79,31 +73,35 @@ function loadAndInitOneSignal(userId: string) {
 
   console.log('[Notif] Loading OneSignal SDK for user:', userId);
 
-  // Load OneSignal Web SDK directly (bypass react-onesignal)
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   window.OneSignalDeferred.push(async (OneSignal: any) => {
     try {
       console.log('[Notif] SDK loaded, initializing...');
       await OneSignal.init({
         appId,
+        serviceWorkerParam: { scope: '/' },
+        serviceWorkerPath: '/OneSignalSDKWorker.js',
         allowLocalhostAsSecureOrigin: true,
+        notifyButton: { enable: false } as any,
       });
-      console.log('[Notif] Initialized, logging in...');
+      console.log('[Notif] Initialized. Permission:', OneSignal.Notifications?.permission);
       await OneSignal.login(userId);
-      console.log('[Notif] Login done. Permission:', OneSignal.Notifications.permission, 'SubID:', OneSignal.User?.PushSubscription?.id);
+      const subId = OneSignal.User?.PushSubscription?.id;
+      const token = OneSignal.User?.PushSubscription?.token;
+      console.log('[Notif] Login done. SubID:', subId, 'Token:', token ? 'yes' : 'no');
     } catch (err) {
-      console.warn('[Notif] OneSignal error:', err);
+      console.error('[Notif] OneSignal init/login error:', err);
     }
   });
 
-  // Add the script tag if not already present
   if (!document.getElementById('onesignal-sdk')) {
     const script = document.createElement('script');
     script.id = 'onesignal-sdk';
     script.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js';
     script.defer = true;
-    script.onerror = () => console.error('[Notif] Failed to load OneSignal SDK script');
+    script.onload = () => console.log('[Notif] SDK script loaded successfully');
+    script.onerror = (e) => console.error('[Notif] Failed to load OneSignal SDK script:', e);
     document.head.appendChild(script);
-    console.log('[Notif] SDK script tag added');
+    console.log('[Notif] SDK script tag added to head');
   }
 }

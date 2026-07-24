@@ -249,8 +249,23 @@ export default function AdminPage() {
                 </div>
 
                 <div className="bg-white rounded-2xl p-5 space-y-3">
-                  <h3 className="font-bold text-purple-ink">Test Notifications</h3>
-                  <p className="text-xs text-gray-500">Send a test push notification to yourself to verify the setup works.</p>
+                  <h3 className="font-bold text-purple-ink">Notification Diagnostics</h3>
+                  <button
+                    onClick={async () => {
+                      const perm = 'Notification' in window ? Notification.permission : 'N/A';
+                      const regs = await navigator.serviceWorker?.getRegistrations() || [];
+                      const swInfo = regs.map(r => r.active?.scriptURL || r.installing?.scriptURL || 'unknown').join(', ') || 'None';
+                      const osState = (window as any).OneSignal ? 'loaded' : 'not loaded';
+                      let subId = 'N/A';
+                      try {
+                        if ((window as any).OneSignal?.User?.PushSubscription?.id) subId = (window as any).OneSignal.User.PushSubscription.id;
+                      } catch {}
+                      addToast(`Permission: ${perm} | SW: ${swInfo} | OneSignal: ${osState} | SubID: ${subId}`, 'info');
+                    }}
+                    className="bg-gray-200 text-purple-ink text-sm font-bold px-4 py-2 rounded-full hover:bg-gray-300 transition-colors"
+                  >
+                    Check Status
+                  </button>
                   <button
                     onClick={async () => {
                       const token = await getToken();
