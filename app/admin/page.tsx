@@ -67,25 +67,21 @@ export default function AdminPage() {
 
   const fetchAll = async () => {
     setLoading(true);
-    try {
-      const [statsData, usersData, alertsData, jobsData, ticketsData] = await Promise.all([
-        adminGet('stats'),
-        adminGet('profiles'),
-        adminGet('alerts'),
-        adminGet('jobs'),
-        adminGet('support'),
-      ]);
-      setStats(statsData);
-      setUsers(usersData);
-      setAlerts(alertsData);
-      setJobs(jobsData);
-      setTickets(ticketsData);
-    } catch (err) {
-      console.error('[Admin] fetchAll failed:', err);
-      addToast(`Admin data load failed: ${err}`, 'error');
-    } finally {
-      setLoading(false);
-    }
+    const results = await Promise.allSettled([
+      adminGet('stats'),
+      adminGet('profiles'),
+      adminGet('alerts'),
+      adminGet('jobs'),
+      adminGet('support'),
+    ]);
+    const errors: string[] = [];
+    if (results[0].status === 'fulfilled') setStats(results[0].value); else errors.push(`stats: ${results[0].reason}`);
+    if (results[1].status === 'fulfilled') setUsers(results[1].value); else errors.push(`users: ${results[1].reason}`);
+    if (results[2].status === 'fulfilled') setAlerts(results[2].value); else errors.push(`alerts: ${results[2].reason}`);
+    if (results[3].status === 'fulfilled') setJobs(results[3].value); else errors.push(`jobs: ${results[3].reason}`);
+    if (results[4].status === 'fulfilled') setTickets(results[4].value); else errors.push(`support: ${results[4].reason}`);
+    if (errors.length) addToast(`Failed: ${errors.join('; ')}`, 'error');
+    setLoading(false);
   };
 
   const handleBanUser = async (targetUserId: string, ban: boolean) => {

@@ -84,9 +84,16 @@ export async function GET(req: NextRequest) {
   if (resource === 'alerts') {
     const { data, error } = await db
       .from('roach_alerts')
-      .select('*, profiles!roach_alerts_bugaphobe_id_fkey(display_name)')
+      .select('*')
       .order('created_at', { ascending: false });
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (data && data.length > 0) {
+      const userIds = [...new Set(data.map((a: any) => a.bugaphobe_id))];
+      const { data: profiles } = await db.from('profiles').select('user_id, display_name').in('user_id', userIds);
+      const nameMap: Record<string, string> = {};
+      if (profiles) for (const p of profiles) nameMap[p.user_id] = p.display_name;
+      return NextResponse.json(data.map((a: any) => ({ ...a, profiles: { display_name: nameMap[a.bugaphobe_id] || 'Unknown' } })));
+    }
     return NextResponse.json(data);
   }
 
