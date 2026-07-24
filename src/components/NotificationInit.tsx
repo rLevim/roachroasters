@@ -37,7 +37,7 @@ export function NotificationInit() {
   if (!showBanner) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-purple-dark text-white p-3 flex items-center justify-between gap-3 shadow-lg">
+    <div className="sticky top-0 left-0 right-0 z-[60] bg-coral text-white p-3 flex items-center justify-between gap-3 shadow-lg">
       <p className="text-sm font-semibold flex-1">
         Enable notifications to get alerts when a roaster is nearby or someone messages you.
       </p>
