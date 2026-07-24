@@ -69,11 +69,22 @@ export async function POST(req: NextRequest) {
     const payload = await req.json();
     const { type, record, table } = payload;
 
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    if (table === 'test') {
+      const { user_id } = record;
+      const result = await sendPush(
+        [user_id as string],
+        'Test Notification',
+        'If you see this, push notifications are working!',
+        'https://www.roachroasters.com/home'
+      );
+      return NextResponse.json({ success: true, onesignal: result });
+    }
+
     if (type !== 'INSERT') {
       return NextResponse.json({ skipped: true });
     }
-
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     if (table === 'messages') {
       const { sender_id, job_id, content, message_type } = record;

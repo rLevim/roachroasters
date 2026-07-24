@@ -249,6 +249,32 @@ export default function AdminPage() {
                 </div>
 
                 <div className="bg-white rounded-2xl p-5 space-y-3">
+                  <h3 className="font-bold text-purple-ink">Test Notifications</h3>
+                  <p className="text-xs text-gray-500">Send a test push notification to yourself to verify the setup works.</p>
+                  <button
+                    onClick={async () => {
+                      const token = await getToken();
+                      const { data: { user } } = await supabase.auth.getUser();
+                      if (!token || !user) { addToast('Not logged in', 'error'); return; }
+                      try {
+                        const res = await fetch('/api/push-notification', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                          body: JSON.stringify({ type: 'INSERT', table: 'test', record: { user_id: user.id } }),
+                        });
+                        const result = await res.json();
+                        addToast(`Result: ${JSON.stringify(result)}`, res.ok ? 'success' : 'error');
+                      } catch (err) {
+                        addToast(`Error: ${err}`, 'error');
+                      }
+                    }}
+                    className="bg-purple-mid text-white text-sm font-bold px-4 py-2 rounded-full hover:bg-purple-dark transition-colors"
+                  >
+                    Send Test Notification
+                  </button>
+                </div>
+
+                <div className="bg-white rounded-2xl p-5 space-y-3">
                   <h3 className="font-bold text-purple-ink">Recent Users</h3>
                   {users.slice(0, 5).map((u) => (
                     <div key={u.id} className="flex items-center gap-3 py-2 border-b border-gray-100 last:border-0">

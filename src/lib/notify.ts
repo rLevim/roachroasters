@@ -3,9 +3,12 @@ import { supabase } from '@/lib/supabase';
 export async function triggerPushNotification(table: string, record: Record<string, unknown>) {
   try {
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.access_token) return;
+    if (!session?.access_token) {
+      console.warn('[Push] No session token, skipping notification');
+      return;
+    }
 
-    await fetch('/api/push-notification', {
+    const res = await fetch('/api/push-notification', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -13,7 +16,10 @@ export async function triggerPushNotification(table: string, record: Record<stri
       },
       body: JSON.stringify({ type: 'INSERT', table, record }),
     });
-  } catch {
-    // Push notifications are best-effort — don't block the user flow
+
+    const result = await res.json();
+    console.log('[Push] API response:', res.status, result);
+  } catch (err) {
+    console.warn('[Push] Failed:', err);
   }
 }

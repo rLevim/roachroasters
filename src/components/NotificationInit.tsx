@@ -12,6 +12,8 @@ export function NotificationInit() {
   useEffect(() => {
     if (!user || !profile) return;
 
+    console.log('[Notif] User loaded:', user.id, 'Permission:', typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'N/A');
+
     if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
       setShowBanner(true);
     }
@@ -25,12 +27,14 @@ export function NotificationInit() {
   const handleAllow = async () => {
     setShowBanner(false);
     try {
+      console.log('[Notif] Requesting permission...');
       const permission = await Notification.requestPermission();
+      console.log('[Notif] Permission result:', permission);
       if (permission === 'granted' && user) {
         initOneSignal(user.id);
       }
     } catch (err) {
-      console.warn('Notification permission error:', err);
+      console.warn('[Notif] Permission error:', err);
     }
   };
 
@@ -43,7 +47,7 @@ export function NotificationInit() {
       </p>
       <button
         onClick={handleAllow}
-        className="bg-coral text-white text-sm font-bold px-4 py-2 rounded-full whitespace-nowrap hover:bg-coral-dark transition-colors"
+        className="bg-white text-coral text-sm font-bold px-4 py-2 rounded-full whitespace-nowrap"
       >
         Allow
       </button>
@@ -59,18 +63,28 @@ export function NotificationInit() {
 
 function initOneSignal(userId: string) {
   const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
-  if (!appId) return;
+  if (!appId) {
+    console.warn('[Notif] No OneSignal app ID');
+    return;
+  }
+
+  console.log('[Notif] Initializing OneSignal for user:', userId);
 
   import('react-onesignal').then(({ default: OneSignal }) => {
     OneSignal.init({
       appId,
       allowLocalhostAsSecureOrigin: true,
       notifyButton: { enable: false } as any,
-    }).then(() => {
-      OneSignal.login(userId);
+    }).then(async () => {
+      console.log('[Notif] OneSignal initialized, logging in...');
+      await OneSignal.login(userId);
+      console.log('[Notif] OneSignal login done. Permission:', OneSignal.Notifications.permission, 'Subscription ID:', OneSignal.User.PushSubscription.id);
     }).catch((err) => {
-      if (!String(err).includes('already initialized')) {
-        console.warn('OneSignal init error:', err);
+      if (String(err).includes('already initialized')) {
+        console.log('[Notif] OneSignal already initialized, logging in...');
+        OneSignal.login(userId);
+      } else {
+        console.warn('[Notif] OneSignal init error:', err);
       }
     });
   });
