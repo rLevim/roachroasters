@@ -3,6 +3,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 
+declare global {
+  interface Window {
+    OneSignalDeferred?: Array<(OneSignal: any) => void>;
+  }
+}
+
 export function NotificationInit() {
   const user = useAuthStore((s) => s.user);
   const profile = useAuthStore((s) => s.profile);
@@ -12,16 +18,19 @@ export function NotificationInit() {
   useEffect(() => {
     if (!user || !profile) return;
 
-    console.log('[Notif] User loaded:', user.id, 'Permission:', typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'N/A');
+    const perm = typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'N/A';
+    console.log('[Notif] User loaded:', user.id, 'Permission:', perm);
 
-    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+    if (perm === 'default') {
       setShowBanner(true);
     }
 
     if (initialized.current) return;
     initialized.current = true;
 
-    initOneSignal(user.id);
+    if (perm === 'granted') {
+      loadAndInitOneSignal(user.id);
+    }
   }, [user, profile]);
 
   const handleAllow = async () => {
@@ -31,7 +40,7 @@ export function NotificationInit() {
       const permission = await Notification.requestPermission();
       console.log('[Notif] Permission result:', permission);
       if (permission === 'granted' && user) {
-        initOneSignal(user.id);
+        loadAndInitOneSignal(user.id);
       }
     } catch (err) {
       console.warn('[Notif] Permission error:', err);
@@ -61,31 +70,40 @@ export function NotificationInit() {
   );
 }
 
-function initOneSignal(userId: string) {
+function loadAndInitOneSignal(userId: string) {
   const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
   if (!appId) {
     console.warn('[Notif] No OneSignal app ID');
     return;
   }
 
-  console.log('[Notif] Initializing OneSignal for user:', userId);
+  console.log('[Notif] Loading OneSignal SDK for user:', userId);
 
-  import('react-onesignal').then(({ default: OneSignal }) => {
-    OneSignal.init({
-      appId,
-      allowLocalhostAsSecureOrigin: true,
-      notifyButton: { enable: false } as any,
-    }).then(async () => {
-      console.log('[Notif] OneSignal initialized, logging in...');
+  // Load OneSignal Web SDK directly (bypass react-onesignal)
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  window.OneSignalDeferred.push(async (OneSignal: any) => {
+    try {
+      console.log('[Notif] SDK loaded, initializing...');
+      await OneSignal.init({
+        appId,
+        allowLocalhostAsSecureOrigin: true,
+      });
+      console.log('[Notif] Initialized, logging in...');
       await OneSignal.login(userId);
-      console.log('[Notif] OneSignal login done. Permission:', OneSignal.Notifications.permission, 'Subscription ID:', OneSignal.User.PushSubscription.id);
-    }).catch((err) => {
-      if (String(err).includes('already initialized')) {
-        console.log('[Notif] OneSignal already initialized, logging in...');
-        OneSignal.login(userId);
-      } else {
-        console.warn('[Notif] OneSignal init error:', err);
-      }
-    });
+      console.log('[Notif] Login done. Permission:', OneSignal.Notifications.permission, 'SubID:', OneSignal.User?.PushSubscription?.id);
+    } catch (err) {
+      console.warn('[Notif] OneSignal error:', err);
+    }
   });
+
+  // Add the script tag if not already present
+  if (!document.getElementById('onesignal-sdk')) {
+    const script = document.createElement('script');
+    script.id = 'onesignal-sdk';
+    script.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js';
+    script.defer = true;
+    script.onerror = () => console.error('[Notif] Failed to load OneSignal SDK script');
+    document.head.appendChild(script);
+    console.log('[Notif] SDK script tag added');
+  }
 }
