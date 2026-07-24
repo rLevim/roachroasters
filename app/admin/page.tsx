@@ -22,7 +22,10 @@ async function adminGet(resource: string) {
   const res = await fetch(`/api/admin?resource=${resource}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`API ${resource}: ${res.status} ${text.substring(0, 100)}`);
+  }
   return res.json();
 }
 
@@ -77,6 +80,9 @@ export default function AdminPage() {
       setAlerts(alertsData);
       setJobs(jobsData);
       setTickets(ticketsData);
+    } catch (err) {
+      console.error('[Admin] fetchAll failed:', err);
+      addToast(`Admin data load failed: ${err}`, 'error');
     } finally {
       setLoading(false);
     }
@@ -250,43 +256,63 @@ export default function AdminPage() {
 
                 <div className="bg-white rounded-2xl p-5 space-y-3">
                   <h3 className="font-bold text-purple-ink">Notification Diagnostics</h3>
-                  <button
-                    onClick={async () => {
-                      const perm = 'Notification' in window ? Notification.permission : 'N/A';
-                      const regs = await navigator.serviceWorker?.getRegistrations() || [];
-                      const swInfo = regs.map(r => r.active?.scriptURL || r.installing?.scriptURL || 'unknown').join(', ') || 'None';
-                      const osState = (window as any).OneSignal ? 'loaded' : 'not loaded';
-                      let subId = 'N/A';
-                      try {
-                        if ((window as any).OneSignal?.User?.PushSubscription?.id) subId = (window as any).OneSignal.User.PushSubscription.id;
-                      } catch {}
-                      addToast(`Permission: ${perm} | SW: ${swInfo} | OneSignal: ${osState} | SubID: ${subId}`, 'info');
-                    }}
-                    className="bg-gray-200 text-purple-ink text-sm font-bold px-4 py-2 rounded-full hover:bg-gray-300 transition-colors"
-                  >
-                    Check Status
-                  </button>
-                  <button
-                    onClick={async () => {
-                      const token = await getToken();
-                      const { data: { user } } = await supabase.auth.getUser();
-                      if (!token || !user) { addToast('Not logged in', 'error'); return; }
-                      try {
-                        const res = await fetch('/api/push-notification', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                          body: JSON.stringify({ type: 'INSERT', table: 'test', record: { user_id: user.id } }),
-                        });
-                        const result = await res.json();
-                        addToast(`Result: ${JSON.stringify(result)}`, res.ok ? 'success' : 'error');
-                      } catch (err) {
-                        addToast(`Error: ${err}`, 'error');
-                      }
-                    }}
-                    className="bg-purple-mid text-white text-sm font-bold px-4 py-2 rounded-full hover:bg-purple-dark transition-colors"
-                  >
-                    Send Test Notification
-                  </button>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={async () => {
+                        const perm = 'Notification' in window ? Notification.permission : 'N/A';
+                        const regs = await navigator.serviceWorker?.getRegistrations() || [];
+                        const swInfo = regs.map(r => r.active?.scriptURL || r.installing?.scriptURL || 'unknown').join(', ') || 'None';
+                        const osState = (window as any).OneSignal ? 'loaded' : 'not loaded';
+                        let subId = 'N/A';
+                        try {
+                          if ((window as any).OneSignal?.User?.PushSubscription?.id) subId = (window as any).OneSignal.User.PushSubscription.id;
+                        } catch {}
+                        addToast(`Permission: ${perm} | SW: ${swInfo} | OneSignal: ${osState} | SubID: ${subId}`, 'info');
+                      }}
+                      className="bg-gray-200 text-purple-ink text-sm font-bold px-4 py-2 rounded-full hover:bg-gray-300 transition-colors"
+                    >
+                      Check Status
+                    </button>
+                    <button
+                      onClick={async () => {
+                        try {
+                          const token = await getToken();
+                          if (!token) { addToast('Not logged in', 'error'); return; }
+                          const res = await fetch('/api/admin?resource=health', {
+                            headers: { Authorization: `Bearer ${token}` },
+                          });
+                          const text = await res.text();
+                          addToast(`Health [${res.status}]: ${text.substring(0, 200)}`, res.ok ? 'success' : 'error');
+                        } catch (err) {
+                          addToast(`Health error: ${err}`, 'error');
+                        }
+                      }}
+                      className="bg-gray-200 text-purple-ink text-sm font-bold px-4 py-2 rounded-full hover:bg-gray-300 transition-colors"
+                    >
+                      Check API Health
+                    </button>
+                    <button
+                      onClick={async () => {
+                        const token = await getToken();
+                        const { data: { user } } = await supabase.auth.getUser();
+                        if (!token || !user) { addToast('Not logged in', 'error'); return; }
+                        try {
+                          const res = await fetch('/api/push-notification', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                            body: JSON.stringify({ type: 'INSERT', table: 'test', record: { user_id: user.id } }),
+                          });
+                          const text = await res.text();
+                          addToast(`[${res.status}] ${text.substring(0, 200)}`, res.ok ? 'success' : 'error');
+                        } catch (err) {
+                          addToast(`Error: ${err}`, 'error');
+                        }
+                      }}
+                      className="bg-purple-mid text-white text-sm font-bold px-4 py-2 rounded-full hover:bg-purple-dark transition-colors"
+                    >
+                      Send Test Notification
+                    </button>
+                  </div>
                 </div>
 
                 <div className="bg-white rounded-2xl p-5 space-y-3">
