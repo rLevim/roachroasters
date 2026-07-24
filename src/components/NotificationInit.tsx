@@ -64,7 +64,7 @@ export function NotificationInit() {
   );
 }
 
-function loadAndInitOneSignal(userId: string) {
+async function loadAndInitOneSignal(userId: string) {
   const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
   if (!appId) {
     console.warn('[Notif] No OneSignal app ID');
@@ -72,6 +72,21 @@ function loadAndInitOneSignal(userId: string) {
   }
 
   console.log('[Notif] Loading OneSignal SDK for user:', userId);
+
+  if (navigator.serviceWorker) {
+    try {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for (const reg of regs) {
+        await reg.update();
+        if (reg.waiting) {
+          console.log('[Notif] Activating waiting service worker...');
+          reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        }
+      }
+    } catch (e) {
+      console.warn('[Notif] SW update check failed:', e);
+    }
+  }
 
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   window.OneSignalDeferred.push(async (OneSignal: any) => {
