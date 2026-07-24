@@ -80,7 +80,7 @@ function loadAndInitOneSignal(userId: string) {
       await OneSignal.init({
         appId,
         serviceWorkerParam: { scope: '/' },
-        serviceWorkerPath: '/OneSignalSDKWorker.js',
+        serviceWorkerPath: '/sw.js',
         allowLocalhostAsSecureOrigin: true,
         notifyButton: { enable: false } as any,
       });
