@@ -77,22 +77,15 @@ async function loadAndInitOneSignal(userId: string) {
     try {
       const regs = await navigator.serviceWorker.getRegistrations();
       for (const reg of regs) {
-        const swUrl = reg.active?.scriptURL || '';
-        if (swUrl.includes('sw.js') && !swUrl.includes('OneSignal')) {
-          console.log('[Notif] Unregistering old SW:', swUrl);
-          await reg.unregister();
-        }
+        console.log('[Notif] Unregistering SW:', reg.active?.scriptURL || reg.installing?.scriptURL);
+        await reg.unregister();
       }
-      console.log('[Notif] Testing SW registration...');
-      const testReg = await navigator.serviceWorker.register('/OneSignalSDKWorker.js', { scope: '/' });
-      console.log('[Notif] SW registered:', testReg.active?.scriptURL || testReg.installing?.scriptURL || testReg.waiting?.scriptURL || 'unknown');
-      if (testReg.installing) {
-        testReg.installing.addEventListener('statechange', (e: any) => {
-          console.log('[Notif] SW state:', e.target.state);
-        });
+      if (regs.length > 0) {
+        console.log('[Notif] Unregistered', regs.length, 'SW(s), waiting...');
+        await new Promise(r => setTimeout(r, 1000));
       }
     } catch (e) {
-      console.error('[Notif] SW registration FAILED:', e);
+      console.warn('[Notif] SW cleanup failed:', e);
     }
   }
 
