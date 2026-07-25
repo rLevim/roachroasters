@@ -288,6 +288,42 @@ export default function AdminPage() {
                     </button>
                     <button
                       onClick={async () => {
+                        const L: string[] = [];
+                        const VAPID = 'BMzCIzYqtgz2Bx7S6aPVK6lDWets7kGm-pgo2H4RixFikUaNIoPqjPBBOEWMAfeFjuT9mAvbe-lckGi6vvNEiW0';
+                        const toKey = (s: string) => {
+                          const pad = '='.repeat((4 - (s.length % 4)) % 4);
+                          const b = (s + pad).replace(/-/g, '+').replace(/_/g, '/');
+                          const raw = atob(b); const arr = new Uint8Array(raw.length);
+                          for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+                          return arr;
+                        };
+                        const wt = <T,>(p: Promise<T>, ms: number) => Promise.race([
+                          Promise.resolve(p).then((v) => ({ ok: v } as any)).catch((e) => ({ err: (e && e.message) || String(e) } as any)),
+                          new Promise<any>((r) => setTimeout(() => r({ timeout: true }), ms)),
+                        ]);
+                        try {
+                          L.push('perm=' + Notification.permission);
+                          const rr = await wt(navigator.serviceWorker.register('/OneSignalSDKWorker.js', { scope: '/' }), 8000);
+                          if (rr.timeout) { L.push('register=TIMEOUT'); addToast(L.join(' | '), 'error'); return; }
+                          if (rr.err) { L.push('register=ERR:' + rr.err.slice(0, 50)); addToast(L.join(' | '), 'error'); return; }
+                          L.push('register=ok');
+                          const readyRes = await wt(navigator.serviceWorker.ready, 8000);
+                          if (readyRes.timeout) { L.push('ready=TIMEOUT'); addToast(L.join(' | '), 'error'); return; }
+                          const reg = readyRes.ok as ServiceWorkerRegistration;
+                          L.push('ready=ok');
+                          const sr = await wt(reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: toKey(VAPID) }), 12000);
+                          if (sr.timeout) L.push('subscribe=TIMEOUT');
+                          else if (sr.err) L.push('subscribe=ERR:' + sr.err.slice(0, 60));
+                          else L.push('subscribe=OK ep=' + (sr.ok.endpoint || '').slice(0, 45));
+                        } catch (e: any) { L.push('FATAL:' + (e?.message || String(e)).slice(0, 60)); }
+                        addToast(L.join(' | '), 'info');
+                      }}
+                      className="bg-gray-200 text-purple-ink text-sm font-bold px-4 py-2 rounded-full hover:bg-gray-300 transition-colors"
+                    >
+                      Raw Push Test
+                    </button>
+                    <button
+                      onClick={async () => {
                         try {
                           const token = await getToken();
                           if (!token) { addToast('Not logged in', 'error'); return; }
