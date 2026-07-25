@@ -32,7 +32,16 @@ export function NotificationInit() {
   const handleAllow = async () => {
     setShowBanner(false);
     try {
-      await Notification.requestPermission();
+      const OneSignal = (window as any).OneSignal;
+      // Prefer OneSignal's own permission request — it grants permission AND
+      // creates the push subscription. The raw Notification API grants browser
+      // permission only, leaving the user unsubscribed in OneSignal.
+      if (OneSignal?.Notifications?.requestPermission) {
+        await OneSignal.Notifications.requestPermission();
+        await OneSignal.User.PushSubscription.optIn();
+      } else {
+        await Notification.requestPermission();
+      }
     } catch {
       // permission request unavailable / dismissed — nothing to do
     }
@@ -68,12 +77,16 @@ async function loadAndInitOneSignal(userId: string) {
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   window.OneSignalDeferred.push(async (OneSignal: any) => {
     try {
-      const initPromise = OneSignal.init({ appId });
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('OneSignal init timeout')), 15000)
-      );
-      await Promise.race([initPromise, timeoutPromise]);
+      await OneSignal.init({ appId });
       await OneSignal.login(userId);
+      // Granting OS-level notification permission (via our banner or a prior
+      // visit) does NOT by itself create a OneSignal subscription, and
+      // autoResubscribe only re-subscribes users who were already subscribed.
+      // So when permission is already granted, explicitly opt in to create the
+      // push subscription and register its service worker.
+      if (OneSignal.Notifications.permission) {
+        await OneSignal.User.PushSubscription.optIn();
+      }
     } catch (err) {
       console.error('OneSignal init failed:', err);
     }
