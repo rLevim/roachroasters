@@ -255,15 +255,24 @@ export default function AdminPage() {
                   <div className="flex flex-wrap gap-2">
                     <button
                       onClick={async () => {
-                        const perm = 'Notification' in window ? Notification.permission : 'N/A';
-                        const regs = await navigator.serviceWorker?.getRegistrations() || [];
-                        const swInfo = regs.map(r => r.active?.scriptURL || r.installing?.scriptURL || 'unknown').join(', ') || 'None';
-                        const osState = (window as any).OneSignal ? 'loaded' : 'not loaded';
-                        let subId = 'N/A';
+                        const L: string[] = [];
+                        const OS = (window as any).OneSignal;
+                        L.push('perm=' + ('Notification' in window ? Notification.permission : 'n/a'));
+                        L.push('OS=' + (OS ? 'y' : 'n'));
+                        if (OS) {
+                          try { L.push('OSperm=' + JSON.stringify(OS.Notifications?.permission)); } catch { L.push('OSperm=ERR'); }
+                          try { L.push('optedIn=' + JSON.stringify(OS.User?.PushSubscription?.optedIn)); } catch {}
+                          try {
+                            await OS.User.PushSubscription.optIn();
+                            L.push('optIn=ok');
+                          } catch (e: any) { L.push('optIn=ERR:' + (e?.message || String(e)).slice(0, 80)); }
+                          try { L.push('subId=' + (OS.User?.PushSubscription?.id || 'N/A')); } catch {}
+                        }
                         try {
-                          if ((window as any).OneSignal?.User?.PushSubscription?.id) subId = (window as any).OneSignal.User.PushSubscription.id;
-                        } catch {}
-                        addToast(`Permission: ${perm} | SW: ${swInfo} | OneSignal: ${osState} | SubID: ${subId}`, 'info');
+                          const regs = await navigator.serviceWorker?.getRegistrations() || [];
+                          L.push('SW=' + (regs.map((r) => (r.active || r.installing || r.waiting)?.scriptURL?.split('/').pop()).filter(Boolean).join(',') || 'None'));
+                        } catch { L.push('SW=ERR'); }
+                        addToast(L.join(' | '), 'info');
                       }}
                       className="bg-gray-200 text-purple-ink text-sm font-bold px-4 py-2 rounded-full hover:bg-gray-300 transition-colors"
                     >
