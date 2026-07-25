@@ -21,7 +21,6 @@ export function NotificationInit() {
     initialized.current = true;
 
     const perm = typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'denied';
-    console.log('[Notif] User loaded:', user.id, 'Permission:', perm);
 
     loadAndInitOneSignal(user.id);
 
@@ -33,11 +32,9 @@ export function NotificationInit() {
   const handleAllow = async () => {
     setShowBanner(false);
     try {
-      console.log('[Notif] Requesting permission...');
-      const permission = await Notification.requestPermission();
-      console.log('[Notif] Permission result:', permission);
-    } catch (err) {
-      console.warn('[Notif] Permission error:', err);
+      await Notification.requestPermission();
+    } catch {
+      // permission request unavailable / dismissed — nothing to do
     }
   };
 
@@ -66,47 +63,19 @@ export function NotificationInit() {
 
 async function loadAndInitOneSignal(userId: string) {
   const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
-  if (!appId) {
-    console.warn('[Notif] No OneSignal app ID');
-    return;
-  }
-
-  console.log('[Notif] Loading OneSignal SDK for user:', userId);
-
-  if (navigator.serviceWorker) {
-    try {
-      const regs = await navigator.serviceWorker.getRegistrations();
-      for (const reg of regs) {
-        console.log('[Notif] Unregistering SW:', reg.active?.scriptURL || reg.installing?.scriptURL);
-        await reg.unregister();
-      }
-      if (regs.length > 0) {
-        console.log('[Notif] Unregistered', regs.length, 'SW(s), waiting...');
-        await new Promise(r => setTimeout(r, 1000));
-      }
-    } catch (e) {
-      console.warn('[Notif] SW cleanup failed:', e);
-    }
-  }
+  if (!appId) return;
 
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   window.OneSignalDeferred.push(async (OneSignal: any) => {
     try {
-      console.log('[Notif] SDK loaded, initializing with appId:', appId);
       const initPromise = OneSignal.init({ appId });
-      const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Init timeout after 15s')), 15000));
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('OneSignal init timeout')), 15000)
+      );
       await Promise.race([initPromise, timeoutPromise]);
-      console.log('[Notif] Initialized. Permission:', OneSignal.Notifications?.permission);
       await OneSignal.login(userId);
-      const subId = OneSignal.User?.PushSubscription?.id;
-      const token = OneSignal.User?.PushSubscription?.token;
-      console.log('[Notif] Login done. SubID:', subId, 'Token:', token ? 'yes' : 'no');
     } catch (err) {
-      console.error('[Notif] OneSignal error:', err);
-      try {
-        const regs = await navigator.serviceWorker?.getRegistrations();
-        console.log('[Notif] Current SWs:', regs?.map(r => r.active?.scriptURL || r.installing?.scriptURL));
-      } catch {}
+      console.error('OneSignal init failed:', err);
     }
   });
 
@@ -115,9 +84,6 @@ async function loadAndInitOneSignal(userId: string) {
     script.id = 'onesignal-sdk';
     script.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js';
     script.defer = true;
-    script.onload = () => console.log('[Notif] SDK script loaded successfully');
-    script.onerror = (e) => console.error('[Notif] Failed to load OneSignal SDK script:', e);
     document.head.appendChild(script);
-    console.log('[Notif] SDK script tag added to head');
   }
 }

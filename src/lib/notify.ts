@@ -8,7 +8,7 @@ export async function triggerPushNotification(table: string, record: Record<stri
       return;
     }
 
-    const res = await fetch('/api/push-notification', {
+    await fetch('/api/push-notification', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -16,9 +16,6 @@ export async function triggerPushNotification(table: string, record: Record<stri
       },
       body: JSON.stringify({ type: 'INSERT', table, record }),
     });
-
-    const result = await res.json();
-    console.log('[Push] API response:', res.status, result);
   } catch (err) {
     console.warn('[Push] Failed:', err);
   }
