@@ -256,22 +256,30 @@ export default function AdminPage() {
                     <button
                       onClick={async () => {
                         const L: string[] = [];
-                        const OS = (window as any).OneSignal;
-                        L.push('perm=' + ('Notification' in window ? Notification.permission : 'n/a'));
-                        L.push('OS=' + (OS ? 'y' : 'n'));
-                        if (OS) {
-                          try { L.push('OSperm=' + JSON.stringify(OS.Notifications?.permission)); } catch { L.push('OSperm=ERR'); }
-                          try { L.push('optedIn=' + JSON.stringify(OS.User?.PushSubscription?.optedIn)); } catch {}
-                          try {
-                            await OS.User.PushSubscription.optIn();
-                            L.push('optIn=ok');
-                          } catch (e: any) { L.push('optIn=ERR:' + (e?.message || String(e)).slice(0, 80)); }
-                          try { L.push('subId=' + (OS.User?.PushSubscription?.id || 'N/A')); } catch {}
-                        }
+                        const viol: string[] = [];
+                        const onViol = (e: SecurityPolicyViolationEvent) => viol.push((e.violatedDirective || '') + '->' + (e.blockedURI || '').slice(0, 40));
+                        document.addEventListener('securitypolicyviolation', onViol);
+                        const withTimeout = (p: Promise<unknown>, ms: number) => Promise.race([
+                          Promise.resolve(p).then(() => 'ok').catch((e) => 'ERR:' + ((e && e.message) || String(e)).slice(0, 50)),
+                          new Promise<string>((res) => setTimeout(() => res('TIMEOUT'), ms)),
+                        ]);
                         try {
-                          const regs = await navigator.serviceWorker?.getRegistrations() || [];
-                          L.push('SW=' + (regs.map((r) => (r.active || r.installing || r.waiting)?.scriptURL?.split('/').pop()).filter(Boolean).join(',') || 'None'));
-                        } catch { L.push('SW=ERR'); }
+                          const OS = (window as any).OneSignal;
+                          L.push('perm=' + ('Notification' in window ? Notification.permission : 'n/a'));
+                          L.push('OS=' + (OS ? 'y' : 'n') + ' User=' + (OS?.User ? 'y' : 'n'));
+                          if (OS?.User?.PushSubscription) {
+                            try { L.push('OSperm=' + JSON.stringify(OS.Notifications?.permission)); } catch { L.push('OSperm=ERR'); }
+                            try { L.push('optedIn=' + JSON.stringify(OS.User.PushSubscription.optedIn)); } catch {}
+                            L.push('optIn=' + await withTimeout(OS.User.PushSubscription.optIn(), 6000));
+                            try { L.push('subId=' + (OS.User.PushSubscription.id || 'N/A')); } catch {}
+                          }
+                          try {
+                            const regs = await navigator.serviceWorker?.getRegistrations() || [];
+                            L.push('SW=' + (regs.map((r) => (r.active || r.installing || r.waiting)?.scriptURL?.split('/').pop()).filter(Boolean).join(',') || 'None'));
+                          } catch { L.push('SW=ERR'); }
+                          if (viol.length) L.push('CSP:' + viol.slice(0, 3).join(';'));
+                        } catch (e: any) { L.push('FATAL:' + (e?.message || String(e)).slice(0, 50)); }
+                        document.removeEventListener('securitypolicyviolation', onViol);
                         addToast(L.join(' | '), 'info');
                       }}
                       className="bg-gray-200 text-purple-ink text-sm font-bold px-4 py-2 rounded-full hover:bg-gray-300 transition-colors"
