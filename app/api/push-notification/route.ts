@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-
-const ONESIGNAL_APP_ID = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID!;
-const ONESIGNAL_REST_API_KEY = process.env.ONESIGNAL_REST_API_KEY!;
+import webpush from 'web-push';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+const VAPID_PUBLIC = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+const VAPID_PRIVATE = process.env.VAPID_PRIVATE_KEY;
+if (VAPID_PUBLIC && VAPID_PRIVATE) {
+  webpush.setVapidDetails(
+    process.env.VAPID_SUBJECT || 'mailto:admin@roachroasters.com',
+    VAPID_PUBLIC,
+    VAPID_PRIVATE
+  );
+}
 
 function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371;
@@ -19,31 +27,44 @@ function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): nu
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-async function sendPush(externalUserIds: string[], title: string, message: string, url?: string) {
-  if (!externalUserIds.length) return;
+// Send a Web Push notification to every stored subscription for the given users.
+// Stale subscriptions (410 Gone / 404) are pruned automatically.
+async function sendPush(userIds: string[], title: string, message: string, url?: string) {
+  if (!userIds.length) return { sent: 0, subscriptions: 0 };
 
-  const body: Record<string, unknown> = {
-    app_id: ONESIGNAL_APP_ID,
-    include_aliases: { external_id: externalUserIds },
-    target_channel: 'push',
-    headings: { en: title },
-    contents: { en: message },
-  };
+  const db = createClient(supabaseUrl, supabaseServiceKey);
+  const { data: subs } = await db
+    .from('push_subscriptions')
+    .select('endpoint, p256dh, auth')
+    .in('user_id', userIds);
 
-  if (url) body.url = url;
+  if (!subs || subs.length === 0) return { sent: 0, subscriptions: 0 };
 
-  const res = await fetch('https://api.onesignal.com/notifications', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Key ${ONESIGNAL_REST_API_KEY}`,
-    },
-    body: JSON.stringify(body),
-  });
+  const payload = JSON.stringify({ title, body: message, url: url || '/', icon: '/logo.png' });
+  const stale: string[] = [];
+  let sent = 0;
 
-  const result = await res.json();
-  console.log('OneSignal response:', JSON.stringify(result));
-  return result;
+  await Promise.all(
+    subs.map(async (s) => {
+      try {
+        await webpush.sendNotification(
+          { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
+          payload
+        );
+        sent++;
+      } catch (err: unknown) {
+        const code = (err as { statusCode?: number })?.statusCode;
+        if (code === 404 || code === 410) stale.push(s.endpoint);
+        else console.error('web-push error:', code, (err as Error)?.message);
+      }
+    })
+  );
+
+  if (stale.length) {
+    await db.from('push_subscriptions').delete().in('endpoint', stale);
+  }
+
+  return { sent, subscriptions: subs.length, removed: stale.length };
 }
 
 export async function POST(req: NextRequest) {
@@ -79,7 +100,7 @@ export async function POST(req: NextRequest) {
         'If you see this, push notifications are working!',
         'https://www.roachroasters.com/home'
       );
-      return NextResponse.json({ success: true, onesignal: result });
+      return NextResponse.json({ success: true, ...result });
     }
 
     if (type !== 'INSERT') {

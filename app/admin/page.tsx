@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { supabase } from '@/lib/supabase';
 import { Navbar } from '@/components/Navbar';
 import { useToastStore } from '@/components/Toast';
+import { subscribeToPush } from '@/components/NotificationInit';
 import type { Profile, Job, RoachAlert, SupportMessage } from '@/types/database';
 
 const ADMIN_EMAIL = 'rotem.levim@gmail.com';
@@ -256,30 +257,15 @@ export default function AdminPage() {
                     <button
                       onClick={async () => {
                         const L: string[] = [];
-                        const viol: string[] = [];
-                        const onViol = (e: SecurityPolicyViolationEvent) => viol.push((e.violatedDirective || '') + '->' + (e.blockedURI || '').slice(0, 40));
-                        document.addEventListener('securitypolicyviolation', onViol);
-                        const withTimeout = (p: Promise<unknown>, ms: number) => Promise.race([
-                          Promise.resolve(p).then(() => 'ok').catch((e) => 'ERR:' + ((e && e.message) || String(e)).slice(0, 50)),
-                          new Promise<string>((res) => setTimeout(() => res('TIMEOUT'), ms)),
-                        ]);
                         try {
-                          const OS = (window as any).OneSignal;
                           L.push('perm=' + ('Notification' in window ? Notification.permission : 'n/a'));
-                          L.push('OS=' + (OS ? 'y' : 'n') + ' User=' + (OS?.User ? 'y' : 'n'));
-                          if (OS?.User?.PushSubscription) {
-                            try { L.push('OSperm=' + JSON.stringify(OS.Notifications?.permission)); } catch { L.push('OSperm=ERR'); }
-                            try { L.push('optedIn=' + JSON.stringify(OS.User.PushSubscription.optedIn)); } catch {}
-                            L.push('optIn=' + await withTimeout(OS.User.PushSubscription.optIn(), 6000));
-                            try { L.push('subId=' + (OS.User.PushSubscription.id || 'N/A')); } catch {}
-                          }
-                          try {
-                            const regs = await navigator.serviceWorker?.getRegistrations() || [];
-                            L.push('SW=' + (regs.map((r) => (r.active || r.installing || r.waiting)?.scriptURL?.split('/').pop()).filter(Boolean).join(',') || 'None'));
-                          } catch { L.push('SW=ERR'); }
-                          if (viol.length) L.push('CSP:' + viol.slice(0, 3).join(';'));
-                        } catch (e: any) { L.push('FATAL:' + (e?.message || String(e)).slice(0, 50)); }
-                        document.removeEventListener('securitypolicyviolation', onViol);
+                          const regs = await navigator.serviceWorker?.getRegistrations() || [];
+                          L.push('SW=' + (regs.map((r) => (r.active || r.installing || r.waiting)?.scriptURL?.split('/').pop()).filter(Boolean).join(',') || 'None'));
+                          const reg = regs.find((r) => (r.active || r.installing || r.waiting)?.scriptURL?.includes('/sw.js')) || regs[0];
+                          const sub = reg ? await reg.pushManager.getSubscription() : null;
+                          L.push('pushSub=' + (sub ? 'yes' : 'no'));
+                          if (sub) L.push('ep=…' + sub.endpoint.slice(-16));
+                        } catch (e: any) { L.push('ERR:' + (e?.message || String(e)).slice(0, 60)); }
                         addToast(L.join(' | '), 'info');
                       }}
                       className="bg-gray-200 text-purple-ink text-sm font-bold px-4 py-2 rounded-full hover:bg-gray-300 transition-colors"
@@ -288,39 +274,22 @@ export default function AdminPage() {
                     </button>
                     <button
                       onClick={async () => {
-                        const L: string[] = [];
-                        const VAPID = 'BMzCIzYqtgz2Bx7S6aPVK6lDWets7kGm-pgo2H4RixFikUaNIoPqjPBBOEWMAfeFjuT9mAvbe-lckGi6vvNEiW0';
-                        const toKey = (s: string) => {
-                          const pad = '='.repeat((4 - (s.length % 4)) % 4);
-                          const b = (s + pad).replace(/-/g, '+').replace(/_/g, '/');
-                          const raw = atob(b); const arr = new Uint8Array(raw.length);
-                          for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
-                          return arr;
-                        };
-                        const wt = <T,>(p: Promise<T>, ms: number) => Promise.race([
-                          Promise.resolve(p).then((v) => ({ ok: v } as any)).catch((e) => ({ err: (e && e.message) || String(e) } as any)),
-                          new Promise<any>((r) => setTimeout(() => r({ timeout: true }), ms)),
-                        ]);
                         try {
-                          L.push('perm=' + Notification.permission);
-                          const rr = await wt(navigator.serviceWorker.register('/OneSignalSDKWorker.js', { scope: '/' }), 8000);
-                          if (rr.timeout) { L.push('register=TIMEOUT'); addToast(L.join(' | '), 'error'); return; }
-                          if (rr.err) { L.push('register=ERR:' + rr.err.slice(0, 50)); addToast(L.join(' | '), 'error'); return; }
-                          L.push('register=ok');
-                          const readyRes = await wt(navigator.serviceWorker.ready, 8000);
-                          if (readyRes.timeout) { L.push('ready=TIMEOUT'); addToast(L.join(' | '), 'error'); return; }
-                          const reg = readyRes.ok as ServiceWorkerRegistration;
-                          L.push('ready=ok');
-                          const sr = await wt(reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: toKey(VAPID) }), 12000);
-                          if (sr.timeout) L.push('subscribe=TIMEOUT');
-                          else if (sr.err) L.push('subscribe=ERR:' + sr.err.slice(0, 60));
-                          else L.push('subscribe=OK ep=' + (sr.ok.endpoint || '').slice(0, 45));
-                        } catch (e: any) { L.push('FATAL:' + (e?.message || String(e)).slice(0, 60)); }
-                        addToast(L.join(' | '), 'info');
+                          if (!('Notification' in window)) { addToast('Notifications not supported', 'error'); return; }
+                          if (Notification.permission !== 'granted') {
+                            const p = await Notification.requestPermission();
+                            if (p !== 'granted') { addToast('Permission: ' + p, 'error'); return; }
+                          }
+                          await subscribeToPush();
+                          const regs = await navigator.serviceWorker.getRegistrations();
+                          const reg = regs.find((r) => (r.active || r.installing || r.waiting)?.scriptURL?.includes('/sw.js'));
+                          const sub = reg ? await reg.pushManager.getSubscription() : null;
+                          addToast(sub ? ('Subscribed ✓ …' + sub.endpoint.slice(-16)) : 'No subscription created', sub ? 'success' : 'error');
+                        } catch (e: any) { addToast('Subscribe error: ' + (e?.message || String(e)).slice(0, 80), 'error'); }
                       }}
                       className="bg-gray-200 text-purple-ink text-sm font-bold px-4 py-2 rounded-full hover:bg-gray-300 transition-colors"
                     >
-                      Raw Push Test
+                      Subscribe This Device
                     </button>
                     <button
                       onClick={async () => {

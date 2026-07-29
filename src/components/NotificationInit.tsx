@@ -2,11 +2,60 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useAuthStore } from '@/stores/authStore';
+import { supabase } from '@/lib/supabase';
 
-declare global {
-  interface Window {
-    OneSignalDeferred?: Array<(OneSignal: any) => void>;
+const VAPID_PUBLIC = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const raw = atob(base64);
+  const arr = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+  return arr;
+}
+
+// Register our own service worker, create (or reuse) a push subscription, and
+// persist it to Supabase so the server can send Web Push notifications later.
+export async function subscribeToPush(): Promise<void> {
+  if (!VAPID_PUBLIC) return;
+  if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  if (Notification.permission !== 'granted') return;
+
+  // One-time cleanup: remove the old OneSignal worker if it's still registered.
+  try {
+    const regs = await navigator.serviceWorker.getRegistrations();
+    for (const r of regs) {
+      const url = r.active?.scriptURL || r.installing?.scriptURL || r.waiting?.scriptURL || '';
+      if (url.includes('OneSignalSDKWorker')) await r.unregister();
+    }
+  } catch {
+    // best-effort
   }
+
+  const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+  await navigator.serviceWorker.ready;
+
+  let sub = await reg.pushManager.getSubscription();
+  if (!sub) {
+    sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC) as BufferSource,
+    });
+  }
+
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) return;
+
+  const json = sub.toJSON() as { endpoint?: string; keys?: { p256dh: string; auth: string } };
+  await fetch('/api/push-subscribe', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify({ endpoint: json.endpoint, keys: json.keys, userAgent: navigator.userAgent }),
+  });
 }
 
 export function NotificationInit() {
@@ -22,9 +71,9 @@ export function NotificationInit() {
 
     const perm = typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'denied';
 
-    loadAndInitOneSignal(user.id);
-
-    if (perm === 'default') {
+    if (perm === 'granted') {
+      subscribeToPush().catch((err) => console.error('Push subscribe failed:', err));
+    } else if (perm === 'default') {
       setShowBanner(true);
     }
   }, [user, profile]);
@@ -32,18 +81,10 @@ export function NotificationInit() {
   const handleAllow = async () => {
     setShowBanner(false);
     try {
-      const OneSignal = (window as any).OneSignal;
-      // Prefer OneSignal's own permission request — it grants permission AND
-      // creates the push subscription. The raw Notification API grants browser
-      // permission only, leaving the user unsubscribed in OneSignal.
-      if (OneSignal?.Notifications?.requestPermission) {
-        await OneSignal.Notifications.requestPermission();
-        await OneSignal.User.PushSubscription.optIn();
-      } else {
-        await Notification.requestPermission();
-      }
-    } catch {
-      // permission request unavailable / dismissed — nothing to do
+      const perm = await Notification.requestPermission();
+      if (perm === 'granted') await subscribeToPush();
+    } catch (err) {
+      console.error('Push permission/subscribe failed:', err);
     }
   };
 
@@ -68,35 +109,4 @@ export function NotificationInit() {
       </button>
     </div>
   );
-}
-
-async function loadAndInitOneSignal(userId: string) {
-  const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
-  if (!appId) return;
-
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  window.OneSignalDeferred.push(async (OneSignal: any) => {
-    try {
-      await OneSignal.init({ appId });
-      await OneSignal.login(userId);
-      // Granting OS-level notification permission (via our banner or a prior
-      // visit) does NOT by itself create a OneSignal subscription, and
-      // autoResubscribe only re-subscribes users who were already subscribed.
-      // So when permission is already granted, explicitly opt in to create the
-      // push subscription and register its service worker.
-      if (OneSignal.Notifications.permission) {
-        await OneSignal.User.PushSubscription.optIn();
-      }
-    } catch (err) {
-      console.error('OneSignal init failed:', err);
-    }
-  });
-
-  if (!document.getElementById('onesignal-sdk')) {
-    const script = document.createElement('script');
-    script.id = 'onesignal-sdk';
-    script.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js';
-    script.defer = true;
-    document.head.appendChild(script);
-  }
 }
