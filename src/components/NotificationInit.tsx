@@ -22,12 +22,25 @@ export async function subscribeToPush(): Promise<void> {
   if (typeof window === 'undefined' || !('serviceWorker' in navigator) || !('PushManager' in window)) return;
   if (Notification.permission !== 'granted') return;
 
-  // One-time cleanup: remove the old OneSignal worker if it's still registered.
+  const appServerKey = urlBase64ToUint8Array(VAPID_PUBLIC) as BufferSource;
+
+  // Clear any prior push state that could block a fresh subscription: the old
+  // OneSignal worker AND its push subscription. A lingering subscription made
+  // with a different VAPID key makes Chrome throw "Registration failed - push
+  // service error", so we must unsubscribe it (not just unregister the worker).
   try {
     const regs = await navigator.serviceWorker.getRegistrations();
     for (const r of regs) {
       const url = r.active?.scriptURL || r.installing?.scriptURL || r.waiting?.scriptURL || '';
-      if (url.includes('OneSignalSDKWorker')) await r.unregister();
+      if (!url.includes('/sw.js')) {
+        try {
+          const old = await r.pushManager.getSubscription();
+          if (old) await old.unsubscribe();
+        } catch {
+          // best-effort
+        }
+        try { await r.unregister(); } catch { /* best-effort */ }
+      }
     }
   } catch {
     // best-effort
@@ -36,12 +49,20 @@ export async function subscribeToPush(): Promise<void> {
   const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
   await navigator.serviceWorker.ready;
 
-  let sub = await reg.pushManager.getSubscription();
-  if (!sub) {
-    sub = await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC) as BufferSource,
-    });
+  const doSubscribe = async () => {
+    const existing = await reg.pushManager.getSubscription();
+    if (existing) await existing.unsubscribe(); // drop any stale / wrong-key sub
+    return reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: appServerKey });
+  };
+
+  let sub: PushSubscription;
+  try {
+    sub = await doSubscribe();
+  } catch {
+    // Retry once after a short delay — the old FCM registration may still be
+    // releasing.
+    await new Promise((r) => setTimeout(r, 800));
+    sub = await doSubscribe();
   }
 
   const { data: { session } } = await supabase.auth.getSession();
