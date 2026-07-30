@@ -69,7 +69,7 @@ export async function subscribeToPush(): Promise<void> {
   if (!session?.access_token) return;
 
   const json = sub.toJSON() as { endpoint?: string; keys?: { p256dh: string; auth: string } };
-  await fetch('/api/push-subscribe', {
+  const res = await fetch('/api/push-subscribe', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -77,6 +77,10 @@ export async function subscribeToPush(): Promise<void> {
     },
     body: JSON.stringify({ endpoint: json.endpoint, keys: json.keys, userAgent: navigator.userAgent }),
   });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '');
+    throw new Error(`Save failed (${res.status}): ${detail.slice(0, 140)}`);
+  }
 }
 
 export function NotificationInit() {

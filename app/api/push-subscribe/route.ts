@@ -26,6 +26,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid subscription' }, { status: 400 });
   }
 
+  void userAgent; // accepted for forward-compat, not persisted
+
   const db = createClient(supabaseUrl, serviceKey);
   const { error } = await db
     .from('push_subscriptions')
@@ -35,8 +37,6 @@ export async function POST(req: NextRequest) {
         endpoint,
         p256dh: keys.p256dh,
         auth: keys.auth,
-        user_agent: userAgent || null,
-        updated_at: new Date().toISOString(),
       },
       { onConflict: 'endpoint' }
     );
