@@ -338,10 +338,10 @@ export default function HomePage() {
           href="https://www.paypal.com/paypalme/rLevim"
           target="_blank"
           rel="noopener noreferrer"
-          className="block bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-center hover:shadow-md transition-shadow"
+          className="block bg-fuchsia-50 border border-fuchsia-200 rounded-2xl p-4 text-center hover:shadow-md transition-shadow"
         >
-          <p className="text-sm font-bold text-yellow-800">{t('landing.support.title')} {t('landing.support.button')}!</p>
-          <p className="text-xs text-yellow-600 mt-1">{t('landing.support.desc')}</p>
+          <p className="text-sm font-bold text-fuchsia-800">{t('landing.support.title')} {t('landing.support.button')}!</p>
+          <p className="text-xs text-fuchsia-600 mt-1">{t('landing.support.desc')}</p>
         </a>
       </div>
     </div>

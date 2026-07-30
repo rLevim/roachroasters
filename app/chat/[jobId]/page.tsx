@@ -509,10 +509,10 @@ export default function ChatPage() {
                 href={`https://www.paypal.me/${otherProfile.paypal_me}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block bg-fuchsia-600 border border-fuchsia-700 rounded-2xl p-4 text-center hover:shadow-md transition-shadow"
+                className="block bg-fuchsia-50 border border-fuchsia-200 rounded-2xl p-4 text-center hover:shadow-md transition-shadow"
               >
-                <p className="text-sm font-bold text-white">Happy with the service? Buy {otherName} a coffee!</p>
-                <p className="text-xs text-fuchsia-100 mt-1">Show your appreciation with a tip</p>
+                <p className="text-sm font-bold text-fuchsia-800">Happy with the service? Buy {otherName} a coffee!</p>
+                <p className="text-xs text-fuchsia-600 mt-1">Show your appreciation with a tip</p>
               </a>
             )}
 
