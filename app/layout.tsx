@@ -10,6 +10,7 @@ const assistant = Assistant({
 });
 import { AuthInitializer } from '@/components/AuthInitializer';
 import { NotificationInit } from '@/components/NotificationInit';
+import { ProfileLinkBanner } from '@/components/ProfileLinkBanner';
 import { ToastContainer } from '@/components/Toast';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ClientProviders } from '@/components/ClientProviders';
@@ -41,6 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ClientProviders>
           <AuthInitializer />
           <NotificationInit />
+          <ProfileLinkBanner />
           <ErrorBoundary>
             {children}
           </ErrorBoundary>

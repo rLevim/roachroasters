@@ -12,6 +12,7 @@ export interface Profile {
   display_name: string;
   photo_url: string | null;
   bio: string | null;
+  social_link: string | null;
   role: UserRole;
   city: string | null;
   rating: number;

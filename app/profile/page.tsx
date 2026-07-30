@@ -21,6 +21,7 @@ export default function ProfilePage() {
   const [editing, setEditing] = useState(false);
   const [displayName, setDisplayName] = useState('');
   const [bio, setBio] = useState('');
+  const [socialLink, setSocialLink] = useState('');
   const [city, setCity] = useState('');
   const [paypalMe, setPaypalMe] = useState('');
   const [notificationRadius, setNotificationRadius] = useState(10);
@@ -38,12 +39,19 @@ export default function ProfilePage() {
     if (profile) {
       setDisplayName(profile.display_name || '');
       setBio(profile.bio || '');
+      setSocialLink(profile.social_link || '');
       setCity(profile.city || '');
       setPaypalMe(profile.paypal_me || '');
       setNotificationRadius(profile.notification_radius_km ?? 10);
       setPhotoUrl(profile.photo_url);
     }
   }, [profile]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('edit')) {
+      setEditing(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (!userId) return;
@@ -128,6 +136,7 @@ export default function ProfilePage() {
       const updates: Record<string, unknown> = {
         display_name: displayName.trim(),
         bio: bio.trim(),
+        social_link: socialLink.trim() || null,
         city: city.trim() || null,
       };
       if (isRoaster) {
@@ -359,6 +368,20 @@ export default function ProfilePage() {
                 className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-mid"
                 placeholder="e.g. Tel Aviv"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-600 mb-1">Social / Profile Link</label>
+              <input
+                type="url"
+                value={socialLink}
+                onChange={(e) => setSocialLink(e.target.value)}
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-mid"
+                placeholder="e.g. https://instagram.com/yourname"
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                Add a social profile (Instagram, Facebook, LinkedIn…) so others can see you&apos;re real — it builds trust and gets you more help and jobs.
+              </p>
             </div>
 
             {isRoaster && (

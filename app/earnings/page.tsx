@@ -76,7 +76,7 @@ export default function EarningsPage() {
           <h3 className="font-bold text-purple-ink">Buy Me a Coffee Link</h3>
           {paypalMe ? (
             <div className="space-y-3">
-              <div className="flex items-center gap-3 bg-yellow-50 rounded-xl p-4">
+              <div className="flex items-center gap-3 bg-fuchsia-50 rounded-xl p-4">
                 <span className="text-2xl">☕</span>
                 <div className="flex-1">
                   <p className="text-sm font-bold text-purple-ink">PayPal.me</p>
@@ -96,9 +96,9 @@ export default function EarningsPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              <div className="bg-yellow-50 border border-yellow-300 rounded-xl p-4 text-center">
-                <p className="text-yellow-800 font-bold text-sm">No PayPal.me set</p>
-                <p className="text-yellow-700 text-xs mt-1">Add your PayPal.me username so grateful Bugaphobes can tip you!</p>
+              <div className="bg-fuchsia-50 border border-fuchsia-300 rounded-xl p-4 text-center">
+                <p className="text-fuchsia-800 font-bold text-sm">No PayPal.me set</p>
+                <p className="text-fuchsia-700 text-xs mt-1">Add your PayPal.me username so grateful Bugaphobes can tip you!</p>
               </div>
               <a
                 href="/profile"
