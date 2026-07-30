@@ -10,6 +10,20 @@ export default function AuthCallbackPage() {
 
   useEffect(() => {
     const handleAuth = async () => {
+      // Surface any error the OAuth provider returned in the URL (query or hash)
+      // instead of silently spinning. Facebook/Google send back e.g.
+      // ?error=...&error_description=... when something goes wrong (a common one
+      // is Facebook not returning an email address).
+      const query = new URLSearchParams(window.location.search);
+      const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+      const providerError =
+        query.get('error_description') || query.get('error') ||
+        hash.get('error_description') || hash.get('error');
+      if (providerError) {
+        setError(decodeURIComponent(providerError.replace(/\+/g, ' ')));
+        return;
+      }
+
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
       if (sessionError) {
@@ -22,7 +36,7 @@ export default function AuthCallbackPage() {
         return;
       }
 
-      // Give detectSessionInUrl a moment to process the hash
+      // Give detectSessionInUrl a moment to process the code/hash
       await new Promise(r => setTimeout(r, 2000));
       const { data: { session: retrySession } } = await supabase.auth.getSession();
       if (retrySession) {
