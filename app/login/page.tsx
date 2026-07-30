@@ -171,6 +171,11 @@ export default function LoginPage() {
             Continue with Facebook
           </button>
         </div>
+        <p className="text-center text-purple-light/70 text-xs mt-4">
+          <a href="/terms-of-use" className="hover:text-white underline">Terms of Use</a>
+          {' · '}
+          <a href="/privacy" className="hover:text-white underline">Privacy Policy</a>
+        </p>
       </div>
     </div>
   );
