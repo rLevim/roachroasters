@@ -37,6 +37,9 @@ export async function POST(req: NextRequest) {
         endpoint,
         p256dh: keys.p256dh,
         auth: keys.auth,
+        // Legacy column from an earlier schema, still NOT NULL — populate it
+        // with the same key material so inserts succeed.
+        keys: { p256dh: keys.p256dh, auth: keys.auth },
       },
       { onConflict: 'endpoint' }
     );
