@@ -434,7 +434,7 @@ export default function LandingPage() {
             href="https://www.paypal.com/paypalme/rLevim"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 rounded-2xl font-bold bg-yellow-400 text-yellow-900 hover:bg-yellow-300 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 text-sm sm:text-base"
+            className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 rounded-2xl font-bold bg-fuchsia-500 text-white hover:bg-fuchsia-600 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 text-sm sm:text-base"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             {t('landing.support.button')}

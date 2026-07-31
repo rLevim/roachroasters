@@ -34,28 +34,36 @@ export default function RoleSelectPage() {
         <div className="space-y-4 mb-8">
           <button
             onClick={() => setSelected('bugaphobe')}
-            className={`w-full bg-white rounded-3xl p-6 text-center border-3 transition-all cursor-pointer ${
-              selected === 'bugaphobe' ? 'border-coral bg-coral-light' : 'border-transparent'
+            className={`w-full bg-white rounded-3xl p-5 flex items-center gap-4 text-left border-4 transition-all cursor-pointer ${
+              selected === 'bugaphobe' ? 'border-coral bg-coral-light' : 'border-transparent hover:border-coral/30'
             }`}
           >
-            <span className="text-5xl block mb-2"> </span>
-            <h3 className="text-xl font-extrabold text-purple-ink">{t('landing.twoSides.bugaphobes')}</h3>
-            <p className="text-gray-500 text-sm mt-1">
-              {t('role.bugaphobe')}
-            </p>
+            <img
+              src="/images/bugaphobe-hero.png"
+              alt="Bugaphobe"
+              className="w-20 h-20 rounded-2xl object-cover object-top shrink-0"
+            />
+            <div className="flex-1">
+              <h3 className="text-xl font-extrabold text-purple-ink">{t('landing.twoSides.bugaphobes')}</h3>
+              <p className="text-gray-500 text-sm mt-1">{t('role.bugaphobe')}</p>
+            </div>
           </button>
 
           <button
             onClick={() => setSelected('roach_roaster')}
-            className={`w-full bg-white rounded-3xl p-6 text-center border-3 transition-all cursor-pointer ${
-              selected === 'roach_roaster' ? 'border-coral bg-coral-light' : 'border-transparent'
+            className={`w-full bg-white rounded-3xl p-5 flex items-center gap-4 text-left border-4 transition-all cursor-pointer ${
+              selected === 'roach_roaster' ? 'border-coral bg-coral-light' : 'border-transparent hover:border-coral/30'
             }`}
           >
-            <span className="text-5xl block mb-2"> </span>
-            <h3 className="text-xl font-extrabold text-purple-ink">{t('landing.twoSides.roasters')}</h3>
-            <p className="text-gray-500 text-sm mt-1">
-              {t('role.roaster')}
-            </p>
+            <img
+              src="/images/roaster-hero.png"
+              alt="Roach Roaster"
+              className="w-20 h-20 rounded-2xl object-cover object-top shrink-0"
+            />
+            <div className="flex-1">
+              <h3 className="text-xl font-extrabold text-purple-ink">{t('landing.twoSides.roasters')}</h3>
+              <p className="text-gray-500 text-sm mt-1">{t('role.roaster')}</p>
+            </div>
           </button>
         </div>
 
