@@ -5,11 +5,13 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/Button';
+import { useI18n } from '@/lib/i18n';
 
 type AuthMode = 'login' | 'signup';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const session = useAuthStore((s) => s.session);
   const initialized = useAuthStore((s) => s.initialized);
   const [authMode, setAuthMode] = useState<AuthMode>('signup');
@@ -47,11 +49,11 @@ export default function LoginPage() {
   const handleEmailAuth = async () => {
     setErrorMsg('');
     if (!email.trim() || !password.trim()) {
-      setErrorMsg('Please enter both email and password.');
+      setErrorMsg(t('auth.errFillBoth'));
       return;
     }
     if (password.length < 6) {
-      setErrorMsg('Password must be at least 6 characters.');
+      setErrorMsg(t('auth.errPwShort'));
       return;
     }
     setLoading(true);
@@ -78,7 +80,7 @@ export default function LoginPage() {
         }
       }
     } catch (e: unknown) {
-      setErrorMsg(e instanceof Error ? e.message : 'Something went wrong');
+      setErrorMsg(e instanceof Error ? e.message : t('auth.errGeneric'));
     } finally {
       setLoading(false);
     }
@@ -89,12 +91,12 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-6">
           <img src="/logo.png" alt="RoachRoasters" className="w-48 h-48 mx-auto object-contain" />
-          <p className="text-purple-light text-lg mt-1">Fear no roach.</p>
+          <p className="text-purple-light text-lg mt-1">{t('auth.tagline')}</p>
         </div>
 
         <div className="bg-white rounded-3xl p-8 space-y-5 shadow-xl">
           <h2 className="text-2xl font-extrabold text-purple-ink text-center">
-            {authMode === 'login' ? 'Welcome Back' : 'Create Account'}
+            {authMode === 'login' ? t('auth.welcomeBack') : t('auth.createAccount')}
           </h2>
 
           {errorMsg && (
@@ -104,7 +106,7 @@ export default function LoginPage() {
           )}
 
           <div>
-            <label className="text-sm font-semibold text-purple-ink block mb-1">Email Address</label>
+            <label className="text-sm font-semibold text-purple-ink block mb-1">{t('auth.email')}</label>
             <input
               type="email"
               placeholder="you@example.com"
@@ -115,10 +117,10 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="text-sm font-semibold text-purple-ink block mb-1">Password</label>
+            <label className="text-sm font-semibold text-purple-ink block mb-1">{t('auth.password')}</label>
             <input
               type="password"
-              placeholder="Min 6 characters"
+              placeholder={t('auth.passwordHint')}
               value={password}
               onChange={(e) => { setPassword(e.target.value); setErrorMsg(''); }}
               className="w-full border border-gray-300 rounded-xl p-4 text-base bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-mid"
@@ -126,7 +128,7 @@ export default function LoginPage() {
           </div>
 
           <Button
-            title={authMode === 'login' ? 'Sign In' : 'Create Account'}
+            title={authMode === 'login' ? t('auth.signIn') : t('auth.createAccount')}
             onClick={handleEmailAuth}
             variant="coral"
             size="lg"
@@ -138,12 +140,12 @@ export default function LoginPage() {
             onClick={() => { setAuthMode(authMode === 'login' ? 'signup' : 'login'); setErrorMsg(''); }}
             className="w-full text-center text-purple-mid text-sm font-semibold hover:underline cursor-pointer"
           >
-            {authMode === 'login' ? "Don't have an account? Sign Up" : 'Already have an account? Sign In'}
+            {authMode === 'login' ? t('auth.toSignup') : t('auth.toLogin')}
           </button>
 
           <div className="flex items-center gap-4 my-1">
             <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-gray-500 text-sm">or</span>
+            <span className="text-gray-500 text-sm">{t('auth.or')}</span>
             <div className="flex-1 h-px bg-gray-200" />
           </div>
 
@@ -158,7 +160,7 @@ export default function LoginPage() {
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 0 0 1 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
             </svg>
-            Continue with Google
+            {t('auth.google')}
           </button>
           <button
             onClick={handleFacebookLogin}
@@ -168,13 +170,13 @@ export default function LoginPage() {
             <svg viewBox="0 0 24 24" width="22" height="22" fill="white">
               <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
             </svg>
-            Continue with Facebook
+            {t('auth.facebook')}
           </button>
         </div>
         <p className="text-center text-purple-light/70 text-xs mt-4">
-          <a href="/terms-of-use" className="hover:text-white underline">Terms of Use</a>
+          <a href="/terms-of-use" className="hover:text-white underline">{t('auth.terms')}</a>
           {' · '}
-          <a href="/privacy" className="hover:text-white underline">Privacy Policy</a>
+          <a href="/privacy" className="hover:text-white underline">{t('auth.privacy')}</a>
         </p>
       </div>
     </div>

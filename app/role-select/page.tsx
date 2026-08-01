@@ -68,7 +68,7 @@ export default function RoleSelectPage() {
         </div>
 
         <Button
-          title="Continue"
+          title={t('common.continue')}
           onClick={handleContinue}
           variant="primary"
           size="lg"

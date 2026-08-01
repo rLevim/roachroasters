@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { BUGAPHOBE_ONBOARDING, ROASTER_ONBOARDING } from '@/constants/onboarding';
 import { Button } from '@/components/Button';
+import { useI18n } from '@/lib/i18n';
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const profile = useAuthStore((s) => s.profile);
   const completeOnboarding = useAuthStore((s) => s.completeOnboarding);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -37,8 +39,8 @@ export default function OnboardingPage() {
       <div className="w-full max-w-md text-center">
         <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-xl">
           <span className="text-5xl sm:text-6xl block mb-4">{slide.icon}</span>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-purple-ink mb-3">{slide.title}</h2>
-          <p className="text-gray-500 text-sm sm:text-base mb-6 sm:mb-8">{slide.description}</p>
+          <h2 className="text-xl sm:text-2xl font-extrabold text-purple-ink mb-3">{t(slide.titleKey)}</h2>
+          <p className="text-gray-500 text-sm sm:text-base mb-6 sm:mb-8">{t(slide.descKey)}</p>
 
           <div className="flex justify-center gap-2 mb-6">
             {slides.map((_, i) => (
@@ -52,7 +54,7 @@ export default function OnboardingPage() {
           </div>
 
           <Button
-            title={isLast ? "Let's Go!" : 'Next'}
+            title={isLast ? t('ob.letsGo') : t('common.next')}
             onClick={handleNext}
             variant="coral"
             size="lg"
@@ -70,7 +72,7 @@ export default function OnboardingPage() {
               }}
               className="mt-3 text-purple-mid text-sm font-semibold hover:underline cursor-pointer"
             >
-              Skip
+              {t('ob.skip')}
             </button>
           )}
         </div>
