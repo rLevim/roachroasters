@@ -198,6 +198,25 @@ const en: Translations = {
   'lb.bravery': 'Bravery',
   'lb.roasted': 'Roasted',
   'lb.dayStreak': 'Day Streak',
+
+  // Browse (roasters list + nearby alerts)
+  'browse.search': 'Search by name or city...',
+  'browse.noRoasters': 'No Roach Roasters found nearby.',
+  'browse.verified': 'Verified',
+  'browse.unknownCity': 'Unknown city',
+  'browse.rating': 'rating',
+  'browse.killed': 'killed',
+  'browse.reviews': 'reviews',
+  'browse.alertsTitle': 'Nearby Roach Alerts',
+  'browse.noAlerts': 'No active Roach Alerts nearby. Check back soon!',
+  'browse.aBugaphobe': 'A Bugaphobe',
+  'browse.needsHelp': 'Needs help with a roach!',
+  'browse.away': 'away',
+  'browse.open': 'OPEN',
+  'browse.goToChat': 'Go to Chat',
+  'browse.responded': "You've responded! Waiting to be picked.",
+  'browse.roastIt': "I'll Roast It!",
+  'browse.respondMsg': "I'd be happy to help — let's talk!",
 };
 
 const he: Translations = {
@@ -382,7 +401,7 @@ const he: Translations = {
   // Leaderboard
   'lb.title': 'טבלת המובילים',
   'lb.topRoasters': 'הקוטלים המובילים',
-  'lb.bestStreaks': 'הרצפים הכי חזקים',
+  'lb.bestStreaks': 'הכי עקביים',
   'lb.bravest': 'הכי אמיצים',
   'lb.noBugaphobes': 'עדיין אין ג׳וקופובים בדירוג.',
   'lb.noRoasters': 'עדיין אין קוטלים בדירוג.',
@@ -390,7 +409,26 @@ const he: Translations = {
   'lb.unknown': 'לא ידוע',
   'lb.bravery': 'אומץ',
   'lb.roasted': 'חוסלו',
-  'lb.dayStreak': 'ימי רצף',
+  'lb.dayStreak': 'ימים רצופים',
+
+  // Browse (roasters list + nearby alerts)
+  'browse.search': 'חיפוש לפי שם או עיר...',
+  'browse.noRoasters': 'לא נמצאו קוטלי ג׳וקים באזור.',
+  'browse.verified': 'מאומת',
+  'browse.unknownCity': 'עיר לא ידועה',
+  'browse.rating': 'דירוג',
+  'browse.killed': 'חוסלו',
+  'browse.reviews': 'ביקורות',
+  'browse.alertsTitle': 'התראות ג׳וקים באזור',
+  'browse.noAlerts': 'אין כרגע התראות ג׳וקים באזור. בדקו שוב עוד מעט!',
+  'browse.aBugaphobe': 'ג׳וקופוב',
+  'browse.needsHelp': 'צריך/ה עזרה עם ג׳וק!',
+  'browse.away': 'ממך',
+  'browse.open': 'פתוח',
+  'browse.goToChat': 'למעבר לצ׳אט',
+  'browse.responded': 'הגבת! ממתין/ה שיבחרו בך.',
+  'browse.roastIt': 'אני אטפל בזה!',
+  'browse.respondMsg': 'אשמח לעזור — בואו נדבר!',
 };
 
 const translations: Record<Lang, Translations> = { en, he };

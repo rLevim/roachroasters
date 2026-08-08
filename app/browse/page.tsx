@@ -7,6 +7,7 @@ import { useAlertStore } from '@/stores/alertStore';
 import { supabase } from '@/lib/supabase';
 import { Navbar } from '@/components/Navbar';
 import { ListSkeleton } from '@/components/Skeleton';
+import { useI18n } from '@/lib/i18n';
 import type { Profile, RoachAlert } from '@/types/database';
 
 function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -37,6 +38,7 @@ export default function BrowsePage() {
 }
 
 function BrowseRoasters() {
+  const { t } = useI18n();
   const [roasters, setRoasters] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('');
@@ -67,7 +69,7 @@ function BrowseRoasters() {
     <div className="max-w-2xl mx-auto p-4 space-y-3">
       <input
         type="text"
-        placeholder="Search by name or city..."
+        placeholder={t('browse.search')}
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
         className="w-full bg-white border border-gray-200 rounded-xl p-4 text-base focus:outline-none focus:ring-2 focus:ring-purple-mid"
@@ -76,7 +78,7 @@ function BrowseRoasters() {
       {loading ? (
         <ListSkeleton count={4} />
       ) : filtered.length === 0 ? (
-        <p className="text-center text-gray-500 py-10">No Roach Roasters found nearby.</p>
+        <p className="text-center text-gray-500 py-10">{t('browse.noRoasters')}</p>
       ) : (
         filtered.map((roaster) => (
           <div
@@ -95,19 +97,19 @@ function BrowseRoasters() {
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-purple-ink">{roaster.display_name}</span>
                   {roaster.is_verified && (
-                    <span className="text-xs font-bold text-coral bg-coral-light px-2 py-0.5 rounded">Verified</span>
+                    <span className="text-xs font-bold text-coral bg-coral-light px-2 py-0.5 rounded">{t('browse.verified')}</span>
                   )}
                 </div>
-                <p className="text-sm text-gray-500">{roaster.city || 'Unknown city'}</p>
+                <p className="text-sm text-gray-500">{roaster.city || t('browse.unknownCity')}</p>
               </div>
               <span className="bg-purple-mid text-white font-extrabold text-sm px-3 py-1 rounded-full">
                 ${roaster.price || '?'}
               </span>
             </a>
             <div className="flex gap-4 mt-2 pl-16 text-sm text-gray-600">
-              <span>{roaster.rating?.toFixed(1) || '0.0'} rating</span>
-              <span>{roaster.roaches_killed} killed</span>
-              <span>{roaster.total_reviews} reviews</span>
+              <span>{roaster.rating?.toFixed(1) || '0.0'} {t('browse.rating')}</span>
+              <span>{roaster.roaches_killed} {t('browse.killed')}</span>
+              <span>{roaster.total_reviews} {t('browse.reviews')}</span>
             </div>
           </div>
         ))
@@ -117,6 +119,7 @@ function BrowseRoasters() {
 }
 
 function BrowseAlerts() {
+  const { t } = useI18n();
   const { alerts, loading, fetchNearbyAlerts } = useAlertStore();
   const respondToAlert = useAlertStore((s) => s.respondToAlert);
   const userId = useAuthStore((s) => s.user?.id);
@@ -188,7 +191,7 @@ function BrowseAlerts() {
   const handleRespond = async (alertId: string) => {
     setRespondingId(alertId);
     try {
-      await respondToAlert(alertId, "I'd be happy to help — let's talk!");
+      await respondToAlert(alertId, t('browse.respondMsg'));
       setRespondedIds((prev) => new Set(prev).add(alertId));
     } finally {
       setRespondingId(null);
@@ -197,12 +200,12 @@ function BrowseAlerts() {
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-3">
-      <h2 className="text-xl font-extrabold text-purple-ink">Nearby Roach Alerts</h2>
+      <h2 className="text-xl font-extrabold text-purple-ink">{t('browse.alertsTitle')}</h2>
 
       {loading ? (
         <ListSkeleton count={4} />
       ) : alerts.length === 0 ? (
-        <p className="text-center text-gray-500 py-10">No active Roach Alerts nearby. Check back soon!</p>
+        <p className="text-center text-gray-500 py-10">{t('browse.noAlerts')}</p>
       ) : (
         alerts.map((alert: RoachAlert & { profiles?: Profile }) => {
           const distanceKm = myLocation && alert.latitude && alert.longitude
@@ -216,24 +219,24 @@ function BrowseAlerts() {
               <Link href={`/alerts/${alert.id}`} className="flex items-center gap-4">
                 <span className="text-4xl"> </span>
                 <div className="flex-1">
-                  <p className="font-bold text-purple-ink">{alert.profiles?.display_name || 'A Bugaphobe'}</p>
-                  <p className="text-sm text-gray-500">{alert.description || 'Needs help with a roach!'}</p>
+                  <p className="font-bold text-purple-ink">{alert.profiles?.display_name || t('browse.aBugaphobe')}</p>
+                  <p className="text-sm text-gray-500">{alert.description || t('browse.needsHelp')}</p>
                   {distanceKm !== null && (
-                    <p className="text-sm text-purple-mid font-semibold mt-1">~{formatDistance(distanceKm)} away</p>
+                    <p className="text-sm text-purple-mid font-semibold mt-1">~{formatDistance(distanceKm)} {t('browse.away')}</p>
                   )}
                 </div>
-                <span className="bg-coral text-white font-extrabold text-sm px-3 py-1 rounded-full">OPEN</span>
+                <span className="bg-coral text-white font-extrabold text-sm px-3 py-1 rounded-full">{t('browse.open')}</span>
               </Link>
               {activeJobId ? (
                 <Link
                   href={`/chat/${activeJobId}`}
                   className="block w-full bg-purple-mid text-white font-extrabold py-3 rounded-xl text-center hover:bg-purple-dark transition-colors"
                 >
-                  Go to Chat
+                  {t('browse.goToChat')}
                 </Link>
               ) : hasResponded ? (
                 <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-center">
-                  <p className="text-green-700 font-bold text-sm">You've responded! Waiting to be picked.</p>
+                  <p className="text-green-700 font-bold text-sm">{t('browse.responded')}</p>
                 </div>
               ) : (
                 <button
@@ -244,7 +247,7 @@ function BrowseAlerts() {
                   {respondingId === alert.id ? (
                     <span className="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
-                    "I'll Roast It!"
+                    t('browse.roastIt')
                   )}
                 </button>
               )}
