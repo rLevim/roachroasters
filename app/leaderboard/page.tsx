@@ -6,11 +6,13 @@ import { useAuthStore } from '@/stores/authStore';
 import { getLevelForXp } from '@/constants/badges';
 import { Navbar } from '@/components/Navbar';
 import { ListSkeleton } from '@/components/Skeleton';
+import { useI18n } from '@/lib/i18n';
 import type { Profile } from '@/types/database';
 
 type Tab = 'all_time' | 'weekly' | 'bravery';
 
 export default function LeaderboardPage() {
+  const { t } = useI18n();
   const userId = useAuthStore((s) => s.user?.id);
   const [tab, setTab] = useState<Tab>('all_time');
   const [roasters, setRoasters] = useState<Profile[]>([]);
@@ -53,20 +55,20 @@ export default function LeaderboardPage() {
     }
   };
 
-  const medals = ['1st', '2nd', '3rd'];
+  const medals = ['🥇', '🥈', '🥉'];
 
   return (
     <div className="min-h-screen bg-lavender">
       <Navbar />
       <div className="max-w-2xl mx-auto p-4 space-y-4">
-        <h1 className="text-2xl font-extrabold text-purple-ink text-center">Leaderboard</h1>
+        <h1 className="text-2xl font-extrabold text-purple-ink text-center">{t('lb.title')}</h1>
 
         {/* Tabs */}
         <div className="flex bg-white rounded-xl p-1 gap-1">
           {([
-            ['all_time', 'Top Roasters'],
-            ['weekly', 'Best Streaks'],
-            ['bravery', 'Bravest'],
+            ['all_time', t('lb.topRoasters')],
+            ['weekly', t('lb.bestStreaks')],
+            ['bravery', t('lb.bravest')],
           ] as [Tab, string][]).map(([key, label]) => (
             <button
               key={key}
@@ -86,7 +88,7 @@ export default function LeaderboardPage() {
           <ListSkeleton count={5} />
         ) : tab === 'bravery' ? (
           bugaphobes.length === 0 ? (
-            <p className="text-center text-gray-500 py-10">No bugaphobes ranked yet.</p>
+            <p className="text-center text-gray-500 py-10">{t('lb.noBugaphobes')}</p>
           ) : (
             <div className="space-y-2">
               {bugaphobes.map((user, i) => {
@@ -112,13 +114,13 @@ export default function LeaderboardPage() {
                     <div className="flex-1 min-w-0">
                       <p className="font-bold text-purple-ink text-sm truncate">
                         {user.display_name}
-                        {isMe && <span className="text-purple-mid ml-1">(you)</span>}
+                        {isMe && <span className="text-purple-mid ml-1">{t('lb.you')}</span>}
                       </p>
-                      <p className="text-xs text-gray-500">{user.city || 'Unknown'}</p>
+                      <p className="text-xs text-gray-500">{user.city || t('lb.unknown')}</p>
                     </div>
                     <div className="text-right">
                       <p className="font-black text-purple-ink">{user.bravery_score}</p>
-                      <p className="text-[10px] text-gray-400">Bravery</p>
+                      <p className="text-[10px] text-gray-400">{t('lb.bravery')}</p>
                     </div>
                   </a>
                 );
@@ -127,13 +129,13 @@ export default function LeaderboardPage() {
           )
         ) : (
           roasters.length === 0 ? (
-            <p className="text-center text-gray-500 py-10">No roasters ranked yet.</p>
+            <p className="text-center text-gray-500 py-10">{t('lb.noRoasters')}</p>
           ) : (
             <div className="space-y-2">
               {roasters.map((user, i) => {
                 const isMe = user.user_id === userId;
                 const stat = tab === 'all_time' ? user.roaches_killed : user.streak_days;
-                const statLabel = tab === 'all_time' ? 'Roasted' : 'Day Streak';
+                const statLabel = tab === 'all_time' ? t('lb.roasted') : t('lb.dayStreak');
                 return (
                   <a
                     key={user.id}
@@ -155,7 +157,7 @@ export default function LeaderboardPage() {
                     <div className="flex-1 min-w-0">
                       <p className="font-bold text-purple-ink text-sm truncate">
                         {user.display_name}
-                        {isMe && <span className="text-purple-mid ml-1">(you)</span>}
+                        {isMe && <span className="text-purple-mid ml-1">{t('lb.you')}</span>}
                       </p>
                       <p className="text-xs text-gray-500">
                         {getLevelForXp(user.xp || 0)} · {user.city || 'Unknown'}

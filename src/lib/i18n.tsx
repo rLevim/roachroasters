@@ -185,6 +185,19 @@ const en: Translations = {
   'ob.r4.desc': 'Every roast earns XP. Climb the ranks from Rookie to The Exterminator!',
   'ob.r5.title': 'Set Up PayPal.me',
   'ob.r5.desc': "Add your PayPal.me username in your profile so Bugaphobes can tip you. It's optional but appreciated!",
+
+  // Leaderboard
+  'lb.title': 'Leaderboard',
+  'lb.topRoasters': 'Top Roasters',
+  'lb.bestStreaks': 'Best Streaks',
+  'lb.bravest': 'Bravest',
+  'lb.noBugaphobes': 'No bugaphobes ranked yet.',
+  'lb.noRoasters': 'No roasters ranked yet.',
+  'lb.you': '(you)',
+  'lb.unknown': 'Unknown',
+  'lb.bravery': 'Bravery',
+  'lb.roasted': 'Roasted',
+  'lb.dayStreak': 'Day Streak',
 };
 
 const he: Translations = {
@@ -231,7 +244,7 @@ const he: Translations = {
   'landing.twoSides.bugaphobes.1': 'שליחת התראה תוך שניות',
   'landing.twoSides.bugaphobes.2': 'צ׳אט ישיר עם הרוסטר',
   'landing.twoSides.bugaphobes.3': 'חינם לגמרי',
-  'landing.twoSides.roasters': 'לא מפחדים מג׳וקים?',
+  'landing.twoSides.roasters': 'קוטל ג׳וקים',
   'landing.twoSides.roasters.desc': 'בואו להיות גיבורים. קבלו התראות, סלקו ג׳וקים, וקבלו טיפים ממי שעזרתם להם.',
   'landing.twoSides.roasters.1': 'תעזרו לאנשים ותהיו גיבורים',
   'landing.twoSides.roasters.2': 'קבלו טיפים מאסירי תודה',
@@ -365,6 +378,19 @@ const he: Translations = {
   'ob.r4.desc': 'כל טיפול מזכה בנקודות ניסיון. טפסו בדרגות ממתחילים ועד "המחסל"!',
   'ob.r5.title': 'הגדירו PayPal.me',
   'ob.r5.desc': 'הוסיפו את שם המשתמש שלכם ב-PayPal.me בפרופיל כדי שאפשר יהיה לפרגן לכם. זה לא חובה, אבל תמיד נחמד!',
+
+  // Leaderboard
+  'lb.title': 'טבלת המובילים',
+  'lb.topRoasters': 'הקוטלים המובילים',
+  'lb.bestStreaks': 'הרצפים הכי חזקים',
+  'lb.bravest': 'הכי אמיצים',
+  'lb.noBugaphobes': 'עדיין אין ג׳וקופובים בדירוג.',
+  'lb.noRoasters': 'עדיין אין קוטלים בדירוג.',
+  'lb.you': '(את/ה)',
+  'lb.unknown': 'לא ידוע',
+  'lb.bravery': 'אומץ',
+  'lb.roasted': 'חוסלו',
+  'lb.dayStreak': 'ימי רצף',
 };
 
 const translations: Record<Lang, Translations> = { en, he };
