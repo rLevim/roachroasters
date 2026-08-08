@@ -66,7 +66,7 @@ export default function HomePage() {
           supabase.from('profiles').update({
             latitude: pos.coords.latitude,
             longitude: pos.coords.longitude,
-          }).eq('id', userId).then(() => {});
+          }).eq('user_id', userId).then(() => {});
         },
         () => {}
       );

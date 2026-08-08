@@ -226,7 +226,7 @@ const he: Translations = {
   'landing.preview.dashboard': 'הדשבורד שלך',
 
   'landing.twoSides.title': 'שני צדדים, פלטפורמה אחת',
-  'landing.twoSides.bugaphobes': 'מפחדים מג׳וקים?',
+  'landing.twoSides.bugaphobes': 'ג׳וקופוב',
   'landing.twoSides.bugaphobes.desc': 'אתם לא לבד. שלחו התראה ומישהו אמיץ יגיע לטפל בזה — בלי שיפוטיות, רק הקלה.',
   'landing.twoSides.bugaphobes.1': 'שליחת התראה תוך שניות',
   'landing.twoSides.bugaphobes.2': 'צ׳אט ישיר עם הרוסטר',

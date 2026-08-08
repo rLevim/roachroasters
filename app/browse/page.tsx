@@ -177,7 +177,7 @@ function BrowseAlerts() {
           const lng = pos.coords.longitude;
           setMyLocation({ lat, lng });
           if (userId) {
-            supabase.from('profiles').update({ latitude: lat, longitude: lng }).eq('id', userId).then(() => {});
+            supabase.from('profiles').update({ latitude: lat, longitude: lng }).eq('user_id', userId).then(() => {});
           }
         },
         () => {}

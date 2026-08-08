@@ -149,16 +149,16 @@ export async function POST(req: NextRequest) {
         .from('profiles')
         .select('user_id, latitude, longitude, notification_radius_km')
         .eq('role', 'roach_roaster')
-        .neq('user_id', bugaphobe_id)
-        .not('latitude', 'is', null)
-        .not('longitude', 'is', null);
+        .neq('user_id', bugaphobe_id);
 
       if (roasters && roasters.length > 0) {
         const nearbyIds = roasters
           .filter((r) => {
+            // Roasters who haven't shared a location yet still get alerts,
+            // rather than being silently excluded.
+            if (r.latitude == null || r.longitude == null) return true;
             const radius = r.notification_radius_km ?? 10;
-            const dist = haversineKm(latitude, longitude, r.latitude!, r.longitude!);
-            return dist <= radius;
+            return haversineKm(latitude, longitude, r.latitude, r.longitude) <= radius;
           })
           .map((r) => r.user_id);
 
