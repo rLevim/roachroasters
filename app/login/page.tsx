@@ -21,6 +21,13 @@ export default function LoginPage() {
       router.replace('/');
     }
   }, [initialized, session, router]);
+
+  // Open directly in sign-in mode when arriving via a "Log In" link.
+  useEffect(() => {
+    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('mode') === 'login') {
+      setAuthMode('login');
+    }
+  }, []);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);

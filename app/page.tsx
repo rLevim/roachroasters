@@ -181,7 +181,7 @@ export default function LandingPage() {
             </button>
           </div>
           <Link
-            href="/login"
+            href="/login?mode=login"
             className="px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm font-bold hover:bg-white/10 transition-colors"
           >
             {t('landing.login')}

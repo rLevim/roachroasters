@@ -7,7 +7,7 @@ import { useJobStore } from '@/stores/jobStore';
 import { supabase } from '@/lib/supabase';
 import { Navbar } from '@/components/Navbar';
 import { ListSkeleton } from '@/components/Skeleton';
-import type { Job, Profile } from '@/types/database';
+import type { Job, Profile, RoachAlert } from '@/types/database';
 
 const statusColors: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-700',
@@ -32,9 +32,22 @@ export default function ActivityPage() {
   const userId = useAuthStore((s) => s.user?.id);
   const role = useAuthStore((s) => s.profile?.role);
   const [profiles, setProfiles] = useState<Record<string, Profile>>({});
+  const [myAlerts, setMyAlerts] = useState<RoachAlert[]>([]);
   const [tab, setTab] = useState<'active' | 'past'>('active');
 
   useEffect(() => { fetchMyJobs(); }, [fetchMyJobs]);
+
+  // A bugaphobe's own alerts that haven't turned into a job yet (open) — plus
+  // cancelled ones — otherwise a freshly posted alert wouldn't appear here.
+  useEffect(() => {
+    if (!userId) return;
+    supabase
+      .from('roach_alerts')
+      .select('*')
+      .eq('bugaphobe_id', userId)
+      .order('created_at', { ascending: false })
+      .then(({ data }) => { if (data) setMyAlerts(data as RoachAlert[]); });
+  }, [userId]);
 
   useEffect(() => {
     if (myJobs.length === 0) return;
@@ -61,6 +74,13 @@ export default function ActivityPage() {
   const pastJobs = myJobs.filter(j => !activeStatuses.includes(j.status));
   const displayJobs = tab === 'active' ? activeJobs : pastJobs;
 
+  // Open alerts (not yet matched to a job) show as Active; cancelled as Past.
+  const openAlerts = myAlerts.filter(a => a.status === 'open');
+  const cancelledAlerts = myAlerts.filter(a => a.status === 'cancelled');
+  const displayAlerts = tab === 'active' ? openAlerts : cancelledAlerts;
+  const activeCount = activeJobs.length + openAlerts.length;
+  const pastCount = pastJobs.length + cancelledAlerts.length;
+
   return (
     <div className="min-h-screen bg-lavender">
       <Navbar />
@@ -77,7 +97,7 @@ export default function ActivityPage() {
                 : 'bg-white text-purple-mid border border-purple-mid'
             }`}
           >
-            Active ({activeJobs.length})
+            Active ({activeCount})
           </button>
           <button
             onClick={() => setTab('past')}
@@ -87,21 +107,43 @@ export default function ActivityPage() {
                 : 'bg-white text-purple-mid border border-purple-mid'
             }`}
           >
-            Past ({pastJobs.length})
+            Past ({pastCount})
           </button>
         </div>
 
         {loading ? (
           <ListSkeleton count={3} />
-        ) : displayJobs.length === 0 ? (
+        ) : displayJobs.length === 0 && displayAlerts.length === 0 ? (
           <div className="text-center py-10">
             <p className="text-4xl mb-3"> </p>
             <p className="text-gray-500">
-              {tab === 'active' ? 'No active jobs right now.' : 'No past jobs yet.'}
+              {tab === 'active' ? 'No active jobs or alerts right now.' : 'Nothing here yet.'}
             </p>
           </div>
         ) : (
-          displayJobs.map((job) => {
+          <>
+          {displayAlerts.map((alert) => (
+            <Link
+              key={alert.id}
+              href={`/alerts/${alert.id}`}
+              className="block bg-white rounded-2xl p-4 hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-coral flex items-center justify-center text-white text-2xl shrink-0">🚨</div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-purple-ink">Your Roach Alert</p>
+                  <p className="text-sm text-gray-500 truncate">{alert.description || 'Waiting for a Roaster...'}</p>
+                </div>
+                <span className={`text-xs font-bold px-3 py-1 rounded-full ${alert.status === 'open' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                  {alert.status === 'open' ? 'Open' : 'Cancelled'}
+                </span>
+              </div>
+              <p className="text-xs text-gray-400 mt-2 pl-16">
+                {new Date(alert.created_at).toLocaleDateString()} · {new Date(alert.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </p>
+            </Link>
+          ))}
+          {displayJobs.map((job) => {
             const otherId = job.bugaphobe_id === userId ? job.roaster_id : job.bugaphobe_id;
             const otherProfile = profiles[otherId];
             const otherName = otherProfile?.display_name || 'User';
@@ -132,7 +174,8 @@ export default function ActivityPage() {
                 </p>
               </Link>
             );
-          })
+          })}
+          </>
         )}
       </div>
     </div>
