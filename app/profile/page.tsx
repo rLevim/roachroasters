@@ -7,6 +7,7 @@ import { getLevelForXp } from '@/constants/badges';
 import { Navbar } from '@/components/Navbar';
 import { Button } from '@/components/Button';
 import { useToastStore } from '@/components/Toast';
+import { useI18n } from '@/lib/i18n';
 import type { Review } from '@/types/database';
 
 interface ReviewWithProfile extends Review {
@@ -14,6 +15,8 @@ interface ReviewWithProfile extends Review {
 }
 
 export default function ProfilePage() {
+  const { t, lang } = useI18n();
+  const dateLocale = lang === 'he' ? 'he-IL' : 'en-US';
   const { profile, updateProfile, fetchProfile } = useAuthStore();
   const userId = useAuthStore((s) => s.user?.id);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -89,11 +92,11 @@ export default function ProfilePage() {
     const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
     const MAX_SIZE = 5 * 1024 * 1024;
     if (!ALLOWED_TYPES.includes(file.type)) {
-      setUploadError('Only JPG, PNG, and WebP images are allowed.');
+      setUploadError(t('prof.errImageType'));
       return;
     }
     if (file.size > MAX_SIZE) {
-      setUploadError('Image must be under 5 MB.');
+      setUploadError(t('prof.errImageSize'));
       return;
     }
 
@@ -110,7 +113,7 @@ export default function ProfilePage() {
 
       if (err) {
         if (err.message.includes('Bucket not found')) {
-          setUploadError('Photo storage bucket not found. Make sure you have a bucket named "Avatars" in your Supabase dashboard (Storage > New Bucket) and that it is set to public.');
+          setUploadError(t('prof.errBucket'));
         } else {
           setUploadError(err.message);
         }
@@ -124,7 +127,7 @@ export default function ProfilePage() {
       const url = urlData.publicUrl + '?t=' + Date.now();
       setPhotoUrl(url);
       await updateProfile({ photo_url: url });
-      addToast('Photo updated!', 'success');
+      addToast(t('prof.photoUpdated'), 'success');
     } finally {
       setUploading(false);
     }
@@ -145,7 +148,7 @@ export default function ProfilePage() {
       }
       await updateProfile(updates);
       setEditing(false);
-      addToast('Profile saved!', 'success');
+      addToast(t('prof.saved'), 'success');
     } finally {
       setSaving(false);
     }
@@ -160,12 +163,12 @@ export default function ProfilePage() {
         <div className="flex items-center justify-center py-20">
           {initialized ? (
             <div className="text-center space-y-4">
-              <p className="text-gray-500">Please log in to view your profile.</p>
+              <p className="text-gray-500">{t('prof.loginPrompt')}</p>
               <a
-                href="/login"
+                href="/login?mode=login"
                 className="inline-block bg-purple-mid text-white font-bold px-6 py-3 rounded-xl hover:bg-purple-dark transition-colors"
               >
-                Sign In
+                {t('prof.signIn')}
               </a>
             </div>
           ) : (
@@ -186,10 +189,10 @@ export default function ProfilePage() {
           <div className="bg-yellow-50 border border-yellow-300 rounded-2xl p-4 text-center">
             <p className="text-yellow-800 font-bold text-sm">
               {!profile.photo_url && !profile.bio
-                ? 'Add a photo and bio to build trust with others!'
+                ? t('prof.needPhotoBio')
                 : !profile.photo_url
-                  ? 'Add a profile photo so people know who they\'re working with!'
-                  : 'Write a short bio to help others trust you!'}
+                  ? t('prof.needPhoto')
+                  : t('prof.needBio')}
             </p>
           </div>
         )}
@@ -234,12 +237,12 @@ export default function ProfilePage() {
           <div>
             <h2 className="text-2xl font-extrabold text-purple-ink">{profile.display_name}</h2>
             <p className="text-sm text-gray-500">
-              {isBugaphobe ? 'Bugaphobe' : getLevelForXp(profile.xp || 0)}
+              {isBugaphobe ? t('landing.twoSides.bugaphobes') : getLevelForXp(profile.xp || 0)}
               {profile.city && ` · ${profile.city}`}
             </p>
             {profile.is_verified && (
               <span className="inline-block mt-1 bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full">
-                Verified
+                {t('prof.verified')}
               </span>
             )}
           </div>
@@ -250,30 +253,30 @@ export default function ProfilePage() {
               <>
                 <div className="text-center">
                   <p className="text-xl font-black text-purple-ink">{profile.roaches_killed}</p>
-                  <p className="text-[11px] text-gray-500">Roasted</p>
+                  <p className="text-[11px] text-gray-500">{t('prof.roasted')}</p>
                 </div>
                 <div className="text-center">
                   <p className="text-xl font-black text-purple-ink">{profile.rating?.toFixed(1) || '0.0'}</p>
-                  <p className="text-[11px] text-gray-500">Rating</p>
+                  <p className="text-[11px] text-gray-500">{t('prof.rating')}</p>
                 </div>
                 <div className="text-center">
                   <p className="text-xl font-black text-purple-ink">{profile.total_reviews}</p>
-                  <p className="text-[11px] text-gray-500">Reviews</p>
+                  <p className="text-[11px] text-gray-500">{t('prof.reviews')}</p>
                 </div>
               </>
             ) : (
               <>
                 <div className="text-center">
                   <p className="text-xl font-black text-purple-ink">{profile.bravery_score}</p>
-                  <p className="text-[11px] text-gray-500">Bravery</p>
+                  <p className="text-[11px] text-gray-500">{t('prof.bravery')}</p>
                 </div>
                 <div className="text-center">
                   <p className="text-xl font-black text-purple-ink">{profile.rating?.toFixed(1) || '0.0'}</p>
-                  <p className="text-[11px] text-gray-500">Rating</p>
+                  <p className="text-[11px] text-gray-500">{t('prof.rating')}</p>
                 </div>
                 <div className="text-center">
                   <p className="text-xl font-black text-purple-ink">{profile.total_reviews}</p>
-                  <p className="text-[11px] text-gray-500">Reviews</p>
+                  <p className="text-[11px] text-gray-500">{t('prof.reviews')}</p>
                 </div>
               </>
             )}
@@ -284,19 +287,19 @@ export default function ProfilePage() {
         {!editing && (
           <div className="bg-white rounded-2xl p-5 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-purple-ink">About</h3>
+              <h3 className="font-bold text-purple-ink">{t('prof.about')}</h3>
               <button
                 onClick={() => setEditing(true)}
                 className="text-sm font-semibold text-purple-mid hover:text-purple-dark cursor-pointer"
               >
-                Edit
+                {t('prof.edit')}
               </button>
             </div>
             {profile.bio ? (
               <p className="text-gray-700 text-sm leading-relaxed">{profile.bio}</p>
             ) : (
               <p className="text-gray-400 text-sm italic">
-                No bio yet — tell people about yourself to build trust!
+                {t('prof.noBio')}
               </p>
             )}
 
@@ -304,22 +307,22 @@ export default function ProfilePage() {
               <div className="border-t border-gray-100 pt-3 space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">PayPal.me</span>
-                  <span className="font-bold text-purple-ink">{profile.paypal_me || 'Not set'}</span>
+                  <span className="font-bold text-purple-ink">{profile.paypal_me || t('prof.notSet')}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">XP</span>
                   <span className="font-bold text-purple-ink">{profile.xp} XP</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Streak</span>
-                  <span className="font-bold text-purple-ink">{profile.streak_days} days</span>
+                  <span className="text-gray-500">{t('prof.streak')}</span>
+                  <span className="font-bold text-purple-ink">{profile.streak_days} {t('prof.days')}</span>
                 </div>
               </div>
             )}
 
             <div className="border-t border-gray-100 pt-3">
               <p className="text-xs text-gray-400">
-                Member since {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                {t('prof.memberSince')} {new Date(profile.created_at).toLocaleDateString(dateLocale, { month: 'long', year: 'numeric' })}
               </p>
             </div>
           </div>
@@ -328,65 +331,63 @@ export default function ProfilePage() {
         {/* Edit Form */}
         {editing && (
           <div className="bg-white rounded-2xl p-5 space-y-4">
-            <h3 className="font-bold text-purple-ink">Edit Profile</h3>
+            <h3 className="font-bold text-purple-ink">{t('prof.editProfile')}</h3>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-600 mb-1">Display Name</label>
+              <label className="block text-sm font-semibold text-gray-600 mb-1">{t('prof.displayName')}</label>
               <input
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-mid"
-                placeholder="Your name"
+                placeholder={t('prof.yourName')}
               />
             </div>
 
             <div>
               <label className="block text-sm font-semibold text-gray-600 mb-1">
-                Bio — tell people about yourself
+                {t('prof.bioLabel')}
               </label>
               <textarea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 rows={4}
                 className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-mid resize-none"
-                placeholder={isRoaster
-                  ? "e.g. I've been handling pest control for 3 years. Fast, reliable, and I always get the job done."
-                  : "e.g. I live in a ground floor apartment and need help sometimes. Always respectful and pay on time!"}
+                placeholder={isRoaster ? t('prof.bioPhRoaster') : t('prof.bioPhBug')}
               />
               <p className="text-xs text-gray-400 mt-1">
-                A good bio helps others feel comfortable working with you.
+                {t('prof.bioHint')}
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-600 mb-1">City</label>
+              <label className="block text-sm font-semibold text-gray-600 mb-1">{t('prof.city')}</label>
               <input
                 type="text"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-mid"
-                placeholder="e.g. Tel Aviv"
+                placeholder={t('prof.cityPh')}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-600 mb-1">Social / Profile Link</label>
+              <label className="block text-sm font-semibold text-gray-600 mb-1">{t('prof.socialLabel')}</label>
               <input
                 type="url"
                 value={socialLink}
                 onChange={(e) => setSocialLink(e.target.value)}
                 className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-mid"
-                placeholder="e.g. https://instagram.com/yourname"
+                placeholder={t('prof.socialPh')}
               />
               <p className="text-xs text-gray-400 mt-1">
-                Add a social profile (Instagram, Facebook, LinkedIn…) so others can see you&apos;re real — it builds trust and gets you more help and jobs.
+                {t('prof.socialHint')}
               </p>
             </div>
 
             {isRoaster && (
               <div>
-                <label className="block text-sm font-semibold text-gray-600 mb-1">PayPal.me Username</label>
+                <label className="block text-sm font-semibold text-gray-600 mb-1">{t('prof.paypalLabel')}</label>
                 <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-purple-mid">
                   <span className="text-sm text-gray-400 pl-4 shrink-0">paypal.me/</span>
                   <input
@@ -394,11 +395,11 @@ export default function ProfilePage() {
                     value={paypalMe}
                     onChange={(e) => setPaypalMe(e.target.value)}
                     className="flex-1 px-1 py-3 text-sm focus:outline-none"
-                    placeholder="yourUsername"
+                    placeholder={t('prof.paypalPh')}
                   />
                 </div>
                 <p className="text-xs text-gray-400 mt-1">
-                  Bugaphobes can send you a &quot;Buy a Coffee&quot; tip after you help them.
+                  {t('prof.paypalHint')}
                 </p>
               </div>
             )}
@@ -406,7 +407,7 @@ export default function ProfilePage() {
             {isRoaster && (
               <div>
                 <label className="block text-sm font-semibold text-gray-600 mb-1">
-                  Notification Radius — {notificationRadius} km
+                  {t('prof.radiusLabel')} — {notificationRadius} km
                 </label>
                 <input
                   type="range"
@@ -421,21 +422,21 @@ export default function ProfilePage() {
                   <span>50 km</span>
                 </div>
                 <p className="text-xs text-gray-400 mt-1">
-                  Get notified about roach alerts within this distance.
+                  {t('prof.radiusHint')}
                 </p>
               </div>
             )}
 
             <div className="flex gap-3">
               <Button
-                title="Save"
+                title={t('prof.save')}
                 onClick={handleSave}
                 variant="primary"
                 loading={saving}
                 className="flex-1"
               />
               <Button
-                title="Cancel"
+                title={t('prof.cancel')}
                 onClick={() => {
                   setEditing(false);
                   if (profile) {
@@ -455,29 +456,29 @@ export default function ProfilePage() {
 
         {/* Trust & Safety Section */}
         <div className="bg-white rounded-2xl p-5 space-y-3">
-          <h3 className="font-bold text-purple-ink">Trust & Safety</h3>
+          <h3 className="font-bold text-purple-ink">{t('prof.trustSafety')}</h3>
           <div className="space-y-2">
             <div className="flex items-center gap-3">
               <span className={`text-lg ${profile.photo_url ? '' : 'opacity-30'}`}>
                 {profile.photo_url ? '✓' : '—'}
               </span>
-              <span className="text-sm text-gray-700">Profile photo added</span>
+              <span className="text-sm text-gray-700">{t('prof.checkPhoto')}</span>
             </div>
             <div className="flex items-center gap-3">
               <span className={`text-lg ${profile.bio ? '' : 'opacity-30'}`}>
                 {profile.bio ? '✓' : '—'}
               </span>
-              <span className="text-sm text-gray-700">Bio written</span>
+              <span className="text-sm text-gray-700">{t('prof.checkBio')}</span>
             </div>
             <div className="flex items-center gap-3">
               <span className={`text-lg ${profile.is_verified ? '' : 'opacity-30'}`}>
                 {profile.is_verified ? '✓' : '—'}
               </span>
               {profile.is_verified ? (
-                <span className="text-sm text-gray-700">Identity verified</span>
+                <span className="text-sm text-gray-700">{t('prof.checkVerified')}</span>
               ) : (
                 <a href="/verify" className="text-sm text-purple-mid font-semibold hover:text-purple-dark">
-                  Get verified →
+                  {t('prof.getVerified')}
                 </a>
               )}
             </div>
@@ -485,16 +486,16 @@ export default function ProfilePage() {
               <span className={`text-lg ${(profile.total_reviews || 0) > 0 ? '' : 'opacity-30'}`}>
                 {(profile.total_reviews || 0) > 0 ? '✓' : '—'}
               </span>
-              <span className="text-sm text-gray-700">Has reviews from others</span>
+              <span className="text-sm text-gray-700">{t('prof.checkReviews')}</span>
             </div>
           </div>
         </div>
 
         {/* Reviews */}
         <div className="bg-white rounded-2xl p-5 space-y-4">
-          <h3 className="font-bold text-purple-ink">Reviews ({reviews.length})</h3>
+          <h3 className="font-bold text-purple-ink">{t('prof.reviewsTitle')} ({reviews.length})</h3>
           {reviews.length === 0 ? (
-            <p className="text-gray-400 text-sm italic">No reviews yet.</p>
+            <p className="text-gray-400 text-sm italic">{t('prof.noReviews')}</p>
           ) : (
             reviews.map((rev) => (
               <div key={rev.id} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0 space-y-1">
@@ -506,7 +507,7 @@ export default function ProfilePage() {
                       rev.profiles?.display_name?.charAt(0).toUpperCase() || '?'
                     )}
                   </div>
-                  <span className="text-sm font-semibold text-purple-ink">{rev.profiles?.display_name || 'User'}</span>
+                  <span className="text-sm font-semibold text-purple-ink">{rev.profiles?.display_name || t('prof.user')}</span>
                   <div className="flex gap-0.5 ml-auto">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <span key={star} className={`text-sm ${star <= rev.rating ? 'text-yellow-400' : 'text-gray-200'}`}>★</span>
@@ -517,7 +518,7 @@ export default function ProfilePage() {
                   <p className="text-sm text-gray-600 pl-9">{rev.content}</p>
                 )}
                 <p className="text-[10px] text-gray-400 pl-9">
-                  {new Date(rev.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  {new Date(rev.created_at).toLocaleDateString(dateLocale, { month: 'short', day: 'numeric', year: 'numeric' })}
                 </p>
               </div>
             ))
