@@ -269,6 +269,22 @@ const en: Translations = {
   'prof.errImageType': 'Only JPG, PNG, and WebP images are allowed.',
   'prof.errImageSize': 'Image must be under 5 MB.',
   'prof.errBucket': 'Photo storage bucket not found. Make sure you have a bucket named "Avatars" in your Supabase dashboard (Storage > New Bucket) and that it is set to public.',
+
+  // Earnings / Stats
+  'earn.onlyRoasters': 'Stats are only available for Roach Roasters.',
+  'earn.myStats': 'My Stats',
+  'earn.jobsDone': 'Jobs Done',
+  'earn.roasted': 'Roasted',
+  'earn.coffeeLink': 'Buy Me a Coffee Link',
+  'earn.active': 'Active',
+  'earn.coffeeHint': 'Bugaphobes will see a "Buy a Coffee" button on your profile after you help them.',
+  'earn.changePaypal': 'Change PayPal.me username',
+  'earn.noPaypal': 'No PayPal.me set',
+  'earn.noPaypalHint': 'Add your PayPal.me username so grateful Bugaphobes can tip you!',
+  'earn.setupPaypal': 'Set Up PayPal.me in Profile',
+  'earn.completedJobs': 'Completed Jobs',
+  'earn.noJobs': 'No completed jobs yet. Start roasting to earn XP!',
+  'earn.roachEliminated': 'Roach eliminated',
 };
 
 const he: Translations = {
@@ -533,6 +549,22 @@ const he: Translations = {
   'prof.errImageType': 'ניתן להעלות רק תמונות JPG, PNG ו-WebP.',
   'prof.errImageSize': 'התמונה חייבת להיות עד 5 MB.',
   'prof.errBucket': 'לא נמצא bucket לאחסון תמונות. ודאו שיש bucket בשם "Avatars" בדשבורד של Supabase (Storage > New Bucket) ושהוא מוגדר כ-public.',
+
+  // Earnings / Stats
+  'earn.onlyRoasters': 'הסטטיסטיקות זמינות רק לקוטלי ג׳וקים.',
+  'earn.myStats': 'הסטטיסטיקות שלי',
+  'earn.jobsDone': 'עבודות',
+  'earn.roasted': 'חוסלו',
+  'earn.coffeeLink': 'קישור "קנו לי קפה"',
+  'earn.active': 'פעיל',
+  'earn.coffeeHint': 'ג׳וקופובים יראו כפתור "קנו לי קפה" בפרופיל שלכם אחרי שעזרתם להם.',
+  'earn.changePaypal': 'שינוי שם המשתמש ב-PayPal.me',
+  'earn.noPaypal': 'לא הוגדר PayPal.me',
+  'earn.noPaypalHint': 'הוסיפו את שם המשתמש שלכם ב-PayPal.me כדי שג׳וקופובים אסירי תודה יוכלו לפרגן לכם!',
+  'earn.setupPaypal': 'הגדרת PayPal.me בפרופיל',
+  'earn.completedJobs': 'עבודות שהושלמו',
+  'earn.noJobs': 'עדיין אין עבודות שהושלמו. תתחילו לקטול כדי לצבור נקודות!',
+  'earn.roachEliminated': 'ג׳וק חוסל',
 };
 
 const translations: Record<Lang, Translations> = { en, he };
